@@ -1,4 +1,5 @@
-/* Poppins */
+/*@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap'); /* Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700;900&display=swap');
 
 @font-face {
     font-family: 'Poppins';
@@ -34,6 +35,10 @@
     font-style: normal;
 }
 
+:root {
+    --roboto-font: 'Roboto', sans-serif;
+}
+
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
     font-style: normal;
@@ -58,14 +63,46 @@
 .icon-monitor:before { font-family: "Icons"; content: "\e90a"; }
 .icon-arrow:before { font-family: "Social-icons"; content: "\e002"; }
 
-.icon-discord { background-image: url('../images/svgs/discord.svg'); background-size: contain; }
-.icon-facebook { background-image: url('../images/svgs/facebook.svg'); background-size: contain; }
-.icon-github { background-image: url('../images/svgs/github.svg'); background-size: contain; }
-.icon-instagram { background-image: url('../images/svgs/instagram.svg'); background-size: contain; }
-.icon-reddit { background-image: url('../images/svgs/reddit.svg'); background-size: contain; }
-.icon-telegram { background-image: url('../images/svgs/telegram.svg'); background-size: contain; }
-.icon-twitch { background-image: url('../images/svgs/twitch.svg'); background-size: contain; }
-.icon-twitter { background-image: url('../images/svgs/twitter.svg'); background-size: contain; }
-.icon-youtube { background-image: url('../images/svgs/youtube.svg'); background-size: contain; } 
-.icon-tiktok { background-image: url('../images/svgs/tiktok.svg'); background-size: contain; }
-.icon-web { background-image: url('../images/svgs/web.svg'); background-size: contain; }
+.light {
+    .icon-discord { background-image: url('../images/svgs/dark-discord.svg'); background-size: contain; }
+    .icon-instagram { background-image: url('../images/svgs/dark-instagram.svg'); background-size: contain; }
+    .icon-youtube { background-image: url('../images/svgs/dark-youtube.svg'); background-size: contain; }
+    .icon-tiktok { background-image: url('../images/svgs/dark-tiktok.svg'); background-size: contain; }
+    .icon-x { background-image: url("../images/svgs/dark-x.svg"); background-size: contain; }
+
+    .icon-web { background-image: url('../images/svgs/dark-web.svg'); background-size: contain; }
+    .icon-tebex { background-image: url("../images/svgs/dark-tebex.svg"); background-size: contain; }
+    .icon-dynmap { background-image: url("../images/svgs/dark-dynmap.svg"); background-size: contain; }
+
+    .icon-return { background-image: url("../images/svgs/dark-return.svg"); background-size: contain; }
+    .icon-account { background-image: url("../images/svgs/dark-account.svg"); background-size: contain; }
+    .icon-java { background-image: url("../images/svgs/dark-java.svg"); background-size: contain; }
+    .icon-resolution { background-image: url("../images/svgs/dark-resolution.svg"); background-size: contain; }
+    .icon-launcher { background-image: url("../images/svgs/dark-launcher.svg"); background-size: contain; }
+    .icon-save { background-image: url("../images/svgs/dark-save.svg"); background-size: contain; }
+    .icon-light-theme { background-image: url("../images/svgs/dark-light-theme.svg"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .icon-dark-theme { background-image: url("../images/svgs/light-dark-theme.svg"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .icon-auto-theme { background-image: url("../images/svgs/light-auto-theme.svg"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+}
+
+.dark {
+    .icon-discord { background-image: url('../images/svgs/light-discord.svg'); background-size: contain; }
+    .icon-instagram { background-image: url('../images/svgs/light-instagram.svg'); background-size: contain; }
+    .icon-youtube { background-image: url('../images/svgs/light-youtube.svg'); background-size: contain; }
+    .icon-tiktok { background-image: url('../images/svgs/light-tiktok.svg'); background-size: contain; }
+    .icon-x { background-image: url("../images/svgs/light-x.svg"); background-size: contain; }
+
+    .icon-web { background-image: url('../images/svgs/light-web.svg'); background-size: contain; }
+    .icon-tebex { background-image: url("../images/svgs/light-tebex.svg"); background-size: contain; }
+    .icon-dynmap { background-image: url("../images/svgs/light-dynmap.svg"); background-size: contain; }
+
+    .icon-return { background-image: url("../images/svgs/light-return.svg"); background-size: contain; }
+    .icon-account { background-image: url("../images/svgs/light-account.svg"); background-size: contain; }
+    .icon-java { background-image: url("../images/svgs/light-java.svg"); background-size: contain; }
+    .icon-resolution { background-image: url("../images/svgs/light-resolution.svg"); background-size: contain; }
+    .icon-launcher { background-image: url("../images/svgs/light-launcher.svg"); background-size: contain; }
+    .icon-save { background-image: url("../images/svgs/light-save.svg"); background-size: contain; }
+    .icon-light-theme { background-image: url("../images/svgs/dark-light-theme.svg"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .icon-dark-theme { background-image: url("../images/svgs/light-dark-theme.svg"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .icon-auto-theme { background-image: url("../images/svgs/light-auto-theme.svg"); background-size: contain; background-repeat: no-repeat; background-position: center; }
+}

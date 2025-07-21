@@ -1,20 +1,20 @@
 {
     "name": "EarthKingdoms-Launcher",
     "preductname": "EarthKingdoms Launcher",
-    "version": "2.0.3",
-    "description": "Launcher personnalisé fait pour le serveur EarthKingdoms",
+    "version": "2.1.0",
+    "description": "Launcher Minecraft pour le serveur EarthKingdoms",
     "main": "src/app.js",
     "author": {
-        "name": "EarthKingdoms Inc. | Luuxis | OrgeAlexj06",
-        "email": "contact@luuxis.fr",
-        "url": "https://github.com/luuxis"
+        "name": "OrgeAlexj06, EarthKingdoms Inc.",
+        "email": "fallenglorydev@gmail.com",
+        "url": "https://earthkingdoms-mc.fr"
     },
-    "url": "https://files.earthkingdoms-minecraft-faction.fr/launcher",
+    "url": "https://files.earthkingdoms-mc.fr/launcher",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
         "build": "node build.js --obf=true --build=platform",
-        "icon": "node build.js --icon=https://raw.githubusercontent.com/luuxis/Selvania-Launcher/master/src/assets/images/icon.png"
+        "icon": "node build.js --icon=https://raw.githubusercontent.com/EarthKingdomsDev/EarthKingdoms-Launcher-V2/master/src/assets/images/icon.png"
     },
     "license": "CCANC",
     "nodemonConfig": {
@@ -23,15 +23,15 @@
     },
     "dependencies": {
         "electron-updater": "^6.1.8",
-        "minecraft-java-core": "^3.11.0",
+        "minecraft-java-core": "^4.1.5",
         "node-bdd": "^2.0.4",
         "node-fetch": "^2.7.0",
         "xml-js": "^1.6.11"
     },
     "devDependencies": {
         "cross-env": "^7.0.3",
-        "electron": "^30.0.9",
-        "electron-builder": "^24.13.3",
+        "electron": "^30.5.1",
+        "electron-builder": "^26.0.12",
         "javascript-obfuscator": "^4.1.0",
         "jimp": "^0.22.12",
         "nodemon": "^3.1.2",
@@ -39,6 +39,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/EarthKingdomsDev/EarthKingdoms-Launcher-V2.git"
+        "url": "git+https://github.com/EarthKingdoms/EarthKingdoms-Launcher.git"
     }
 }

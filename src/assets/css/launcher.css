@@ -8,9 +8,10 @@ body {
     margin: 0;
     padding: 0;
     user-select: none;
-    color: var(--color);
-    font-family: 'Poppins';
-    font-weight: bolder;
+    color: var(--dark);
+    font-family: var(--roboto-font);
+    font-weight: 500;
+    font-size: 16px;
 }
 
 img {
@@ -38,20 +39,26 @@ input::-webkit-inner-spin-button {
 
 .dragbar {
     position: fixed;
-    /* background: #00000080; */
     top: 0px;
     left: 0px;
     width: 100%;
     height: 26px;
     -webkit-app-region: drag;
     z-index: 11;
+}
+
+.darwin .frame {
+    background: transparent;
+    position: fixed;
+    top: 0px;
+    z-index: 11;
+    -webkit-app-region: no-drag;
     display: none;
 }
 
-.frame {
+.other .frame {
     background: transparent;
     position: fixed;
-    display: table;
     top: 0px;
     right: 0px;
     z-index: 11;
@@ -59,11 +66,19 @@ input::-webkit-inner-spin-button {
     display: none;
 }
 
-.hide {
+.frame.hide {
     display: block;
 }
 
-.button-frame {
+.darwin .button-frame {
+    position: relative;
+    display: table-cell;
+    width: 20px;
+    height: 26px;
+    transition: color .2s, background-color .2s;
+}
+
+.other .button-frame {
     position: relative;
     display: table-cell;
     width: 30px;
@@ -81,6 +96,35 @@ input::-webkit-inner-spin-button {
     height: 14px;
     font-size: 14px;
     color: #f8f9f9;
+}
+
+.darwin-icon-minimize,
+.darwin-icon-maximize,
+.darwin-icon-close {
+    position: relative;
+}
+
+.darwin-icon-minimize:before,
+.darwin-icon-maximize:before,
+.darwin-icon-close:before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+}
+
+.darwin-icon-maximize:before {
+    background: #07d014;
+}
+
+.darwin-icon-minimize:before {
+    background: #ffbd2e;
+}
+
+.darwin-icon-close:before {
+    background: #ff6047;
 }
 
 .icon-close:hover {
@@ -105,17 +149,20 @@ input::-webkit-inner-spin-button {
 }
 
 .popup-tab {
-    width: 40%;
+    width: 50%;
+    background: var(--background-light);
     padding: 15px;
-    background: var(--background);
-    border-radius: 15px;
+    border-radius: 6px;
     z-index: 10;
 }
 
 .popup-title {
     text-align: center;
+    background: var(--background-transparent);
+    padding: 10px;
     font-size: 2rem;
-    border-bottom: solid 4px var(--color);
+    border-radius: 5px;
+    border: solid 3px var(--background-element);
     margin-bottom: 1rem;
 }
 

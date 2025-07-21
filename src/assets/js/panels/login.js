@@ -2,6 +2,7 @@
  * @author Luuxis
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
+
 const { AZauth, Mojang } = require('minecraft-java-core');
 const { ipcRenderer } = require('electron');
 
@@ -9,15 +10,16 @@ import { popup, database, changePanel, accountSelect, addAccount, config, setSta
 
 class Login {
     static id = "login";
+
     async init(config) {
         this.config = config;
         this.db = new database();
 
-        if (typeof this.config.online == 'boolean') {
-            this.config.online ? this.getMicrosoft() : this.getCrack()
-        } else if (typeof this.config.online == 'string') {
-            if (this.config.online.match(/^(http|https):\/\/[^ "]+$/)) {
-                this.getAZauth();
+        if(typeof this.config.online == 'boolean') {
+            this.config.online ? await this.getMicrosoft() : await this.getCrack()
+        } else if(typeof this.config.online == 'string') {
+            if(this.config.online.match(/^(http|https):\/\/[^ "]+$/)) {
+                await this.getAZauth();
             }
         }
         
@@ -36,15 +38,14 @@ class Login {
 
         microsoftBtn.addEventListener("click", () => {
             popupLogin.openPopup({
-                title: 'Connexion',
+                title: 'Connexion en cours',
                 content: 'Veuillez patienter...',
-                color: 'var(--color)'
+                color: 'var(--dark)'
             });
 
             ipcRenderer.invoke('Microsoft-window', this.config.client_id).then(async account_connect => {
-                if (account_connect == 'cancel' || !account_connect) {
+                if(account_connect === 'cancel' || !account_connect) {
                     popupLogin.closePopup();
-                    return;
                 } else {
                     await this.saveData(account_connect)
                     popupLogin.closePopup();
@@ -70,19 +71,19 @@ class Login {
         loginOffline.style.display = 'block';
 
         connectOffline.addEventListener('click', async () => {
-            if (emailOffline.value.length < 3) {
+            if(emailOffline.value.length < 3) {
                 popupLogin.openPopup({
                     title: 'Erreur',
-                    content: 'Votre pseudo doit faire au moins 3 caractères.',
+                    content: 'Votre pseudo doit faire au moins 3 caractères !',
                     options: true
                 });
                 return;
             }
 
-            if (emailOffline.value.match(/ /g)) {
+            if(emailOffline.value.match(/ /g)) {
                 popupLogin.openPopup({
                     title: 'Erreur',
-                    content: 'Votre pseudo ne doit pas contenir d\'espaces.',
+                    content: 'Votre pseudo ne doit pas contenir d\'espaces !',
                     options: true
                 });
                 return;
@@ -90,7 +91,7 @@ class Login {
 
             let MojangConnect = await Mojang.login(emailOffline.value);
 
-            if (MojangConnect.error) {
+            if(MojangConnect.error) {
                 popupLogin.openPopup({
                     title: 'Erreur',
                     content: MojangConnect.message,
@@ -121,15 +122,15 @@ class Login {
 
         AZauthConnectBTN.addEventListener('click', async () => {
             PopupLogin.openPopup({
-                title: 'Connexion en cours...',
+                title: 'Connexion en cours',
                 content: 'Veuillez patienter...',
-                color: 'var(--color)'
+                color: 'var(--dark)'
             });
 
-            if (AZauthEmail.value == '' || AZauthPassword.value == '') {
+            if(AZauthEmail.value === '' || AZauthPassword.value === '') {
                 PopupLogin.openPopup({
                     title: 'Erreur',
-                    content: 'Veuillez remplir tous les champs.',
+                    content: 'Veuillez remplir tous les champs !',
                     options: true
                 });
                 return;
@@ -137,14 +138,13 @@ class Login {
 
             let AZauthConnect = await AZauthClient.login(AZauthEmail.value, AZauthPassword.value);
 
-            if (AZauthConnect.error) {
+            if(AZauthConnect.error) {
                 PopupLogin.openPopup({
                     title: 'Erreur',
                     content: AZauthConnect.message,
                     options: true
                 });
-                return;
-            } else if (AZauthConnect.A2F) {
+            } else if(AZauthConnect.A2F) {
                 loginAZauthA2F.style.display = 'block';
                 loginAZauth.style.display = 'none';
                 PopupLogin.closePopup();
@@ -156,15 +156,15 @@ class Login {
 
                 connectAZauthA2F.addEventListener('click', async () => {
                     PopupLogin.openPopup({
-                        title: 'Connexion en cours...',
+                        title: 'Connexion en cours',
                         content: 'Veuillez patienter...',
-                        color: 'var(--color)'
+                        color: 'var(--dark)'
                     });
 
-                    if (AZauthA2F.value == '') {
+                    if(AZauthA2F.value === '') {
                         PopupLogin.openPopup({
                             title: 'Erreur',
-                            content: 'Veuillez entrer le code A2F.',
+                            content: 'Veuillez entrer le code A2F !',
                             options: true
                         });
                         return;
@@ -172,7 +172,7 @@ class Login {
 
                     AZauthConnect = await AZauthClient.login(AZauthEmail.value, AZauthPassword.value, AZauthA2F.value);
 
-                    if (AZauthConnect.error) {
+                    if(AZauthConnect.error) {
                         PopupLogin.openPopup({
                             title: 'Erreur',
                             content: AZauthConnect.message,
@@ -184,7 +184,7 @@ class Login {
                     await this.saveData(AZauthConnect)
                     PopupLogin.closePopup();
                 });
-            } else if (!AZauthConnect.A2F) {
+            } else if(!AZauthConnect.A2F) {
                 await this.saveData(AZauthConnect)
                 PopupLogin.closePopup();
             }
@@ -198,12 +198,12 @@ class Login {
         let instancesList = await config.getInstanceList()
         configClient.account_selected = account.ID;
 
-        for (let instance of instancesList) {
-            if (instance.whitelistActive) {
-                let whitelist = instance.whitelist.find(whitelist => whitelist == account.name)
-                if (whitelist !== account.name) {
-                    if (instance.name == instanceSelect) {
-                        let newInstanceSelect = instancesList.find(i => i.whitelistActive == false)
+        for(let instance of instancesList) {
+            if(instance.whitelistActive) {
+                let whitelist = instance.whitelist.find(whitelist => whitelist === account.name)
+                if(whitelist !== account.name) {
+                    if(instance.name === instanceSelect) {
+                        let newInstanceSelect = instancesList.find(i => i.whitelistActive === false)
                         configClient.instance_selct = newInstanceSelect.name
                         await setStatus(newInstanceSelect.status)
                     }
@@ -214,7 +214,9 @@ class Login {
         await this.db.updateData('configClient', configClient);
         await addAccount(account);
         await accountSelect(account);
-        changePanel('home');
+
+        ipcRenderer.send('restart-app');
     }
 }
+
 export default Login;

@@ -18,8 +18,8 @@ export default class Slider {
         this.min = parseFloat(this.slider.getAttribute('min'));
         this.max = parseFloat(this.slider.getAttribute('max'));
 
-        if (!minValue) minValue = this.min;
-        if (!maxValue) maxValue = this.max;
+        if(!minValue) minValue = this.min;
+        if(!maxValue) maxValue = this.max;
 
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -69,7 +69,7 @@ export default class Slider {
     onStart(elem, event) {
         event.preventDefault();
 
-        if (elem === this.touchLeft)
+        if(elem === this.touchLeft)
             this.x = this.touchLeft.offsetLeft;
         else
             this.x = this.touchRight.offsetLeft;
@@ -90,15 +90,15 @@ export default class Slider {
     onMove(event) {
         this.x = event.pageX - this.startX;
 
-        if (this.selectedTouch === this.touchLeft) {
-            if (this.x > this.touchRight.offsetLeft - this.selectedTouch.offsetWidth - 24)
+        if(this.selectedTouch === this.touchLeft) {
+            if(this.x > this.touchRight.offsetLeft - this.selectedTouch.offsetWidth - 24)
                 this.x = this.touchRight.offsetLeft - this.selectedTouch.offsetWidth - 24;
-            else if (this.x < 0)
+            else if(this.x < 0)
                 this.x = 0;
 
             this.selectedTouch.style.left = this.x + 'px';
-        } else if (this.selectedTouch === this.touchRight) {
-            if (this.x < this.touchLeft.offsetLeft + this.touchLeft.offsetWidth + 24) {
+        } else if(this.selectedTouch === this.touchRight) {
+            if(this.x < this.touchLeft.offsetLeft + this.touchLeft.offsetWidth + 24) {
                 this.x = this.touchLeft.offsetLeft + this.touchLeft.offsetWidth + 24;
             } else if (this.x > this.maxX)
                 this.x = this.maxX;
@@ -131,7 +131,7 @@ export default class Slider {
         minValue = minValue * (this.max - this.min) + this.min;
         maxValue = maxValue * (this.max - this.min) + this.min;
 
-        if (this.step != 0.0) {
+        if(this.step !== 0.0) {
             let multi = Math.floor(minValue / this.step);
             this.minValue = this.step * multi;
 
@@ -149,6 +149,6 @@ export default class Slider {
     }
 
     emit(name, ...args) {
-        if (this.func[name]) this.func[name](...args);
+        if(this.func[name]) this.func[name](...args);
     }
 }

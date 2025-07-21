@@ -38,7 +38,7 @@ class database {
     async readData(tableName, key = 1) {
         let table = await this.getDatabase(tableName);
         let data = await nodedatabase.getDataById(table, key)
-        if (data) {
+        if(data) {
             let id = data.id
             data = JSON.parse(data.json_data)
             data.ID = id

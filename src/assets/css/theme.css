@@ -12,6 +12,21 @@
     --background-transparent: #2c2c2ccc;
     --shadow: rgba(25, 25, 25, 0.7);
     --svg-color: brightness(0) saturate(100%) invert(100%) sepia(55%) saturate(23%) hue-rotate(236deg) brightness(108%) contrast(92%);
+
+
+    --really-light: #000000;
+    --light: #111111;
+    --dark: #ececec;
+    --really-dark: #ffffff;
+
+    --contour-status: transparent;
+
+    --background-login-tab: #1e1e1e;
+
+    --background-light: rgba(17, 17, 17, 1);
+    --background-dark: rgba(236, 236, 236, 0.6);
+    --background-player-count: rgba(47, 47, 47, 0.7);
+    --background-sidebar: rgba(17, 17, 17, 0.95);
 }
 
 .light {
@@ -21,4 +36,19 @@
     --background-transparent: rgba(204, 204, 204, 0.8);
     --shadow: rgba(208, 208, 208, 0.7);
     --svg-color: brightness(0) saturate(100%) invert(0%) sepia(5%) saturate(1719%) hue-rotate(357deg) brightness(94%) contrast(84%);
+
+
+    --really-light: #ffffff;
+    --light: #ececec;
+    --dark: #111111;
+    --really-dark: #000000;
+
+    --contour-status: #ffffff;
+
+    --background-login-tab: rgba(236, 236, 236, 0.6);
+
+    --background-light: rgba(236, 236, 236, 0.6);
+    --background-dark: rgba(17, 17, 17, 0.6);
+    --background-player-count: rgba(208, 208, 208, 0.7);
+    --background-sidebar: rgba(236, 236, 236, 0.8);
 }

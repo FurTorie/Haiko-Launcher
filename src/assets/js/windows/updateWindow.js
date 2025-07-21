@@ -7,6 +7,9 @@
 const { app, BrowserWindow, Menu } = require("electron");
 const path = require("path");
 const os = require("os");
+
+const packageJson = require(path.join(app.getAppPath(), 'package.json'));
+
 let dev = process.env.DEV_TOOL === 'open';
 let updateWindow = undefined;
 
@@ -15,7 +18,7 @@ function getWindow() {
 }
 
 function destroyWindow() {
-    if (!updateWindow) return;
+    if(!updateWindow) return;
     updateWindow.close();
     updateWindow = undefined;
 }
@@ -38,10 +41,13 @@ function createWindow() {
     Menu.setApplicationMenu(null);
     updateWindow.setMenuBarVisibility(false);
     updateWindow.loadFile(path.join(`${app.getAppPath()}/src/index.html`));
+
     updateWindow.once('ready-to-show', () => {
-        if (updateWindow) {
-            if (dev) updateWindow.webContents.openDevTools({ mode: 'detach' })
+        if(updateWindow) {
+            if(dev) updateWindow.webContents.openDevTools({ mode: 'detach' });
             updateWindow.show();
+
+            updateWindow.webContents.send('app-version', packageJson.version);
         }
     });
 }

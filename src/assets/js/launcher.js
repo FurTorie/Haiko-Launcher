@@ -2,18 +2,17 @@
  * @author Luuxis
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
-// import panel
+
 import Login from './panels/login.js';
 import Home from './panels/home.js';
 import Settings from './panels/settings.js';
 
-// import modules
 import { logger, config, changePanel, database, popup, setBackground, accountSelect, addAccount, pkg } from './utils.js';
 const { AZauth, Microsoft, Mojang } = require('minecraft-java-core');
 
-// libs
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
+const os = require('os');
 
 class Launcher {
     async init() {
@@ -21,18 +20,18 @@ class Launcher {
         console.log('Initializing Launcher...');
         this.shortcut()
         await setBackground()
-        if (process.platform == 'win32') this.initFrame();
+        this.initFrame();
         this.config = await config.GetConfig().then(res => res).catch(err => err);
-        if (await this.config.error) return this.errorConnect()
+        if(await this.config.error) return this.errorConnect()
         this.db = new database();
         await this.initConfigClient();
         this.createPanels(Login, Home, Settings);
-        this.startLauncher();
+        await this.startLauncher();
     }
 
     initLog() {
         document.addEventListener('keydown', e => {
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 73 || e.keyCode == 123) {
+            if(e.ctrlKey && e.shiftKey && e.keyCode === 73 || e.keyCode === 123) {
                 ipcRenderer.send('main-window-dev-tools-close');
                 ipcRenderer.send('main-window-dev-tools');
             }
@@ -42,12 +41,11 @@ class Launcher {
 
     shortcut() {
         document.addEventListener('keydown', e => {
-            if (e.ctrlKey && e.keyCode == 87) {
+            if(e.ctrlKey && e.keyCode === 87) {
                 ipcRenderer.send('main-window-close');
             }
         })
     }
-
 
     errorConnect() {
         new popup().openPopup({
@@ -61,15 +59,16 @@ class Launcher {
 
     initFrame() {
         console.log('Initializing Frame...')
-        document.querySelector('.frame').classList.toggle('hide')
-        document.querySelector('.dragbar').classList.toggle('hide')
+        const platform = os.platform() === 'darwin' ? "darwin" : "other";
 
-        document.querySelector('#minimize').addEventListener('click', () => {
+        document.querySelector(`.${platform} .frame`).classList.toggle('hide')
+
+        document.querySelector(`.${platform} .frame #minimize`).addEventListener('click', () => {
             ipcRenderer.send('main-window-minimize');
         });
 
         let maximized = false;
-        let maximize = document.querySelector('#maximize')
+        let maximize = document.querySelector(`.${platform} .frame #maximize`);
         maximize.addEventListener('click', () => {
             if (maximized) ipcRenderer.send('main-window-maximize')
             else ipcRenderer.send('main-window-maximize');
@@ -78,7 +77,7 @@ class Launcher {
             maximize.classList.toggle('icon-restore-down')
         });
 
-        document.querySelector('#close').addEventListener('click', () => {
+        document.querySelector(`.${platform} .frame #close`).addEventListener('click', () => {
             ipcRenderer.send('main-window-close');
         })
     }
@@ -94,14 +93,14 @@ class Launcher {
                 java_config: {
                     java_path: null,
                     java_memory: {
-                        min: 2,
-                        max: 4
+                        min: 4,
+                        max: 6
                     }
                 },
                 game_config: {
                     screen_size: {
-                        width: 854,
-                        height: 480
+                        width: 1280,
+                        height: 720
                     }
                 },
                 launcher_config: {
@@ -116,7 +115,7 @@ class Launcher {
 
     createPanels(...panels) {
         let panelsElem = document.querySelector('.panels')
-        for (let panel of panels) {
+        for(let panel of panels) {
             console.log(`Initializing ${panel.name} Panel...`);
             let div = document.createElement('div');
             div.classList.add('panel', panel.id)
@@ -132,27 +131,27 @@ class Launcher {
         let account_selected = configClient ? configClient.account_selected : null
         let popupRefresh = new popup();
 
-        if (accounts?.length) {
-            for (let account of accounts) {
+        if(accounts?.length) {
+            for(let account of accounts) {
                 let account_ID = account.ID
-                if (account.error) {
+                if(account.error) {
                     await this.db.deleteData('accounts', account_ID)
                     continue
                 }
-                if (account.meta.type === 'Xbox') {
-                    console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
+                if(account.meta.type === 'Xbox') {
+                    console.log(`Account Type : ${account.meta.type} | Username : ${account.name}`);
                     popupRefresh.openPopup({
                         title: 'Connexion',
-                        content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
-                        color: 'var(--color)',
+                        content: `Type de compte : ${account.meta.type} | Utilisateur : ${account.name}`,
+                        color: 'var(--dark)',
                         background: false
                     });
 
                     let refresh_accounts = await new Microsoft(this.config.client_id).refresh(account);
 
-                    if (refresh_accounts.error) {
+                    if(refresh_accounts.error) {
                         await this.db.deleteData('accounts', account_ID)
-                        if (account_ID == account_selected) {
+                        if(account_ID === account_selected) {
                             configClient.account_selected = null
                             await this.db.updateData('configClient', configClient)
                         }
@@ -163,71 +162,71 @@ class Launcher {
                     refresh_accounts.ID = account_ID
                     await this.db.updateData('accounts', refresh_accounts, account_ID)
                     await addAccount(refresh_accounts)
-                    if (account_ID == account_selected) accountSelect(refresh_accounts)
-                } else if (account.meta.type == 'AZauth') {
-                    console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
+                    if(account_ID === account_selected) await accountSelect(refresh_accounts)
+                } else if(account.meta.type === 'AZauth') {
+                    console.log(`Account Type : ${account.meta.type} | Username : ${account.name}`);
                     popupRefresh.openPopup({
                         title: 'Connexion',
-                        content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
-                        color: 'var(--color)',
+                        content: `Type de compte : ${account.meta.type} | Utilisateur : ${account.name}`,
+                        color: 'var(--dark)',
                         background: false
                     });
                     let refresh_accounts = await new AZauth(this.config.online).verify(account);
 
-                    if (refresh_accounts.error) {
-                        this.db.deleteData('accounts', account_ID)
-                        if (account_ID == account_selected) {
+                    if(refresh_accounts.error) {
+                        await this.db.deleteData('accounts', account_ID)
+                        if(account_ID === account_selected) {
                             configClient.account_selected = null
-                            this.db.updateData('configClient', configClient)
+                            await this.db.updateData('configClient', configClient)
                         }
                         console.error(`[Account] ${account.name}: ${refresh_accounts.message}`);
                         continue;
                     }
 
                     refresh_accounts.ID = account_ID
-                    this.db.updateData('accounts', refresh_accounts, account_ID)
+                    await this.db.updateData('accounts', refresh_accounts, account_ID)
                     await addAccount(refresh_accounts)
-                    if (account_ID == account_selected) accountSelect(refresh_accounts)
-                } else if (account.meta.type == 'Mojang') {
-                    console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
+                    if(account_ID === account_selected) await accountSelect(refresh_accounts)
+                } else if(account.meta.type === 'Mojang') {
+                    console.log(`Account Type : ${account.meta.type} | Username : ${account.name}`);
                     popupRefresh.openPopup({
                         title: 'Connexion',
-                        content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
-                        color: 'var(--color)',
+                        content: `Type de compte : ${account.meta.type} | Utilisateur : ${account.name}`,
+                        color: 'var(--dark)',
                         background: false
                     });
-                    if (account.meta.online == false) {
+                    if(account.meta.online === false) {
                         let refresh_accounts = await Mojang.login(account.name);
 
                         refresh_accounts.ID = account_ID
                         await addAccount(refresh_accounts)
-                        this.db.updateData('accounts', refresh_accounts, account_ID)
-                        if (account_ID == account_selected) accountSelect(refresh_accounts)
+                        await this.db.updateData('accounts', refresh_accounts, account_ID)
+                        if(account_ID === account_selected) await accountSelect(refresh_accounts)
                         continue;
                     }
 
                     let refresh_accounts = await Mojang.refresh(account);
 
-                    if (refresh_accounts.error) {
-                        this.db.deleteData('accounts', account_ID)
-                        if (account_ID == account_selected) {
+                    if(refresh_accounts.error) {
+                        await this.db.deleteData('accounts', account_ID)
+                        if(account_ID === account_selected) {
                             configClient.account_selected = null
-                            this.db.updateData('configClient', configClient)
+                            await this.db.updateData('configClient', configClient)
                         }
                         console.error(`[Account] ${account.name}: ${refresh_accounts.errorMessage}`);
                         continue;
                     }
 
                     refresh_accounts.ID = account_ID
-                    this.db.updateData('accounts', refresh_accounts, account_ID)
+                    await this.db.updateData('accounts', refresh_accounts, account_ID)
                     await addAccount(refresh_accounts)
-                    if (account_ID == account_selected) accountSelect(refresh_accounts)
+                    if(account_ID === account_selected) await accountSelect(refresh_accounts)
                 } else {
                     console.error(`[Account] ${account.name}: Account Type Not Found`);
-                    this.db.deleteData('accounts', account_ID)
-                    if (account_ID == account_selected) {
+                    await this.db.deleteData('accounts', account_ID)
+                    if(account_ID === account_selected) {
                         configClient.account_selected = null
-                        this.db.updateData('configClient', configClient)
+                        await this.db.updateData('configClient', configClient)
                     }
                 }
             }
@@ -236,16 +235,16 @@ class Launcher {
             configClient = await this.db.readData('configClient')
             account_selected = configClient ? configClient.account_selected : null
 
-            if (!account_selected) {
+            if(!account_selected) {
                 let uuid = accounts[0].ID
-                if (uuid) {
+                if(uuid) {
                     configClient.account_selected = uuid
                     await this.db.updateData('configClient', configClient)
-                    accountSelect(uuid)
+                    await accountSelect(uuid)
                 }
             }
 
-            if (!accounts.length) {
+            if(!accounts.length) {
                 config.account_selected = null
                 await this.db.updateData('configClient', config);
                 popupRefresh.closePopup()
@@ -253,10 +252,10 @@ class Launcher {
             }
 
             popupRefresh.closePopup()
-            changePanel("home");
+            await changePanel("home");
         } else {
             popupRefresh.closePopup()
-            changePanel('login');
+            await changePanel('login');
         }
     }
 }

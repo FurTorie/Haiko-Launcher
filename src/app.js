@@ -15,18 +15,18 @@ const MainWindow = require("./assets/js/windows/mainWindow.js");
 
 let dev = process.env.NODE_ENV === 'dev';
 
-if (dev) {
+if(dev) {
     let appPath = path.resolve('./data/Launcher').replace(/\\/g, '/');
     let appdata = path.resolve('./data').replace(/\\/g, '/');
-    if (!fs.existsSync(appPath)) fs.mkdirSync(appPath, { recursive: true });
-    if (!fs.existsSync(appdata)) fs.mkdirSync(appdata, { recursive: true });
+    if(!fs.existsSync(appPath)) fs.mkdirSync(appPath, { recursive: true });
+    if(!fs.existsSync(appdata)) fs.mkdirSync(appdata, { recursive: true });
     app.setPath('userData', appPath);
     app.setPath('appData', appdata)
 }
 
-if (!app.requestSingleInstanceLock()) app.quit();
+if(!app.requestSingleInstanceLock()) app.quit();
 else app.whenReady().then(() => {
-    if (dev) return MainWindow.createWindow()
+    if(dev) return MainWindow.createWindow()
     UpdateWindow.createWindow()
 });
 
@@ -46,11 +46,13 @@ ipcMain.on('update-window-progress', (event, options) => UpdateWindow.getWindow(
 ipcMain.on('update-window-progress-reset', () => UpdateWindow.getWindow().setProgressBar(-1))
 ipcMain.on('update-window-progress-load', () => UpdateWindow.getWindow().setProgressBar(2))
 
+ipcMain.on('restart-app', () => { app.relaunch(); app.exit(0); });
+
 ipcMain.handle('path-user-data', () => app.getPath('userData'))
 ipcMain.handle('appData', e => app.getPath('appData'))
 
 ipcMain.on('main-window-maximize', () => {
-    if (MainWindow.getWindow().isMaximized()) {
+    if(MainWindow.getWindow().isMaximized()) {
         MainWindow.getWindow().unmaximize();
     } else {
         MainWindow.getWindow().maximize();
@@ -65,8 +67,8 @@ ipcMain.handle('Microsoft-window', async (_, client_id) => {
 })
 
 ipcMain.handle('is-dark-theme', (_, theme) => {
-    if (theme === 'dark') return true
-    if (theme === 'light') return false
+    if(theme === 'dark') return true
+    if(theme === 'light') return false
     return nativeTheme.shouldUseDarkColors;
 })
 
@@ -89,7 +91,7 @@ ipcMain.handle('update-app', async () => {
 
 autoUpdater.on('update-available', () => {
     const updateWindow = UpdateWindow.getWindow();
-    if (updateWindow) updateWindow.webContents.send('updateAvailable');
+    if(updateWindow) updateWindow.webContents.send('updateAvailable');
 });
 
 ipcMain.on('start-update', () => {
@@ -98,7 +100,7 @@ ipcMain.on('start-update', () => {
 
 autoUpdater.on('update-not-available', () => {
     const updateWindow = UpdateWindow.getWindow();
-    if (updateWindow) updateWindow.webContents.send('update-not-available');
+    if(updateWindow) updateWindow.webContents.send('update-not-available');
 });
 
 autoUpdater.on('update-downloaded', () => {
@@ -107,10 +109,10 @@ autoUpdater.on('update-downloaded', () => {
 
 autoUpdater.on('download-progress', (progress) => {
     const updateWindow = UpdateWindow.getWindow();
-    if (updateWindow) updateWindow.webContents.send('download-progress', progress);
+    if(updateWindow) updateWindow.webContents.send('download-progress', progress);
 })
 
 autoUpdater.on('error', (err) => {
     const updateWindow = UpdateWindow.getWindow();
-    if (updateWindow) updateWindow.webContents.send('error', err);
+    if(updateWindow) updateWindow.webContents.send('error', err);
 });

@@ -2,13 +2,45 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     height: 100%;
+
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: transform 0.4s ease-in-out, opacity 0.6s ease-in-out;
+}
+
+.login.active .container {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.login-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-new-tab {
+    font-weight: 900;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 2rem;
+    background: var(--background-login-tab);
+    color: var(--dark);
+    text-shadow: 1px 1px 0px var(--light),
+                -1px -1px 0px var(--light),
+                1px -1px 0px var(--light),
+                -1px 1px 0px var(--light);
 }
 
 .login-tabs {
     position: absolute;
     padding: 15px;
-    background: var(--background);
+    background: var(--background-light);
     border-radius: 15px;
     text-align: center;
     min-width: 40%;
@@ -22,7 +54,7 @@
 }
 
 .login-text {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
 .connect,
@@ -47,4 +79,44 @@
     width: 50%;
     padding: 0.4rem 1rem;
     margin-top: 10px;
+}
+
+.connect-home,
+.cancel-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-login-tab);
+    border: 1px solid var(--dark);
+    color: var(--dark);
+    padding: 5px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.connect-home .icon,
+.cancel-home .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.connect-home span,
+.cancel-home span {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+
+.cancel-home span {
+    position: relative;
+    top: 2px;
+}
+
+.connect-home:hover,
+.cancel-home:hover {
+    transform: scale(1.05);
 }

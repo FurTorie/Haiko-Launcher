@@ -12,37 +12,37 @@ class Index {
     async init() {
         this.obf = true
         this.Fileslist = []
-        process.argv.forEach(async val => {
-            if (val.startsWith('--icon')) {
-                return this.iconSet(val.split('=')[1])
+        for (const val of process.argv) {
+            if(val.startsWith('--icon')) {
+                await this.iconSet(val.split('=')[1]);
             }
 
-            if (val.startsWith('--obf')) {
+            if(val.startsWith('--obf')) {
                 this.obf = JSON.parse(val.split('=')[1])
                 this.Fileslist = this.getFiles("src");
             }
 
-            if (val.startsWith('--build')) {
+            if(val.startsWith('--build')) {
                 let buildType = val.split('=')[1]
-                if (buildType == 'platform') return await this.buildPlatform()
+                if(buildType === 'platform') await this.buildPlatform();
             }
-        });
+        }
     }
 
     async Obfuscate() {
-        if (fs.existsSync("./app")) fs.rmSync("./app", { recursive: true })
+        if(fs.existsSync("./app")) fs.rmSync("./app", { recursive: true })
 
-        for (let path of this.Fileslist) {
+        for(let path of this.Fileslist) {
             let fileName = path.split('/').pop()
             let extFile = fileName.split(".").pop()
             let folder = path.replace(`/${fileName}`, '').replace('src', 'app')
 
-            if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
+            if(!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
 
-            if (extFile == 'js') {
+            if(extFile === 'js') {
                 let code = fs.readFileSync(path, "utf8");
                 code = code.replace(/src\//g, 'app/');
-                if (this.obf) {
+                if(this.obf) {
                     await new Promise((resolve) => {
                         console.log(`Obfuscate ${path}`);
                         let obf = JavaScriptObfuscator.obfuscate(code, { optionsPreset: 'medium-obfuscation', disableConsoleOutput: false });
@@ -65,7 +65,7 @@ class Index {
                 generateUpdatesFilesForAllChannels: false,
                 appId: preductname,
                 productName: preductname,
-                copyright: 'Copyright © 2020-2024 Luuxis',
+                copyright: 'Copyright © 2020-2025 EarthKingdoms Inc.',
                 artifactName: "${productName}-${os}-${arch}.${ext}",
                 extraMetadata: { main: 'app/app.js' },
                 files: ["app/**/*", "package.json", "LICENSE.md"],
@@ -111,17 +111,17 @@ class Index {
                 }
             }
         }).then(() => {
-            console.log('le build est terminé')
+            console.log('Build done !')
         }).catch(err => {
-            console.error('Error during build!', err)
+            console.error('Error during build !', err)
         })
     }
 
     getFiles(path, file = []) {
-        if (fs.existsSync(path)) {
+        if(fs.existsSync(path)) {
             let files = fs.readdirSync(path);
-            if (files.length == 0) file.push(path);
-            for (let i in files) {
+            if(files.length === 0) file.push(path);
+            for(let i in files) {
                 let name = `${path}/${files[i]}`;
                 if (fs.statSync(name).isDirectory()) this.getFiles(name, file);
                 else file.push(name);
@@ -132,16 +132,16 @@ class Index {
 
     async iconSet(url) {
         let Buffer = await nodeFetch(url)
-        if (Buffer.status == 200) {
+        if(Buffer.status === 200) {
             Buffer = await Buffer.buffer()
             const image = await Jimp.read(Buffer);
             Buffer = await image.resize(256, 256).getBufferAsync(Jimp.MIME_PNG)
             fs.writeFileSync("src/assets/images/icon.icns", png2icons.createICNS(Buffer, png2icons.BILINEAR, 0));
             fs.writeFileSync("src/assets/images/icon.ico", png2icons.createICO(Buffer, png2icons.HERMITE, 0, false));
             fs.writeFileSync("src/assets/images/icon.png", Buffer);
-            console.log('new icon set')
+            console.log('New icon set !')
         } else {
-            console.log('connection error')
+            console.log('Connection error !')
         }
     }
 }

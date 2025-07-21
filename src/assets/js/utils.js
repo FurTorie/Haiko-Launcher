@@ -40,9 +40,23 @@ async function setBackground(theme) {
 
 async function changePanel(id) {
     let panel = document.querySelector(`.${id}`);
-    let active = document.querySelector(`.active`)
-    if (active) active.classList.toggle("active");
+    let active = document.querySelector(`.active`);
+
+    if (active && active !== panel) {
+        active.querySelector('.container').style.opacity = 0;
+        active.querySelector('.container').style.transform = "scale(0.95)";
+        await new Promise(resolve => setTimeout(resolve, 400));
+
+        active.classList.remove("active");
+        active.querySelector('.container').style.visibility = "hidden";
+    }
+
     panel.classList.add("active");
+    panel.querySelector('.container').style.visibility = "visible";
+    panel.querySelector('.container').style.opacity = 1;
+    setTimeout(() => {
+        panel.querySelector('.container').style.transform = "scale(1)";
+    }, 100);
 }
 
 async function appdata() {
@@ -74,7 +88,7 @@ async function accountSelect(data) {
 
     if (activeAccount) activeAccount.classList.toggle('account-select');
     account.classList.add('account-select');
-    if (data?.profile?.skins[0]?.base64) headplayer(data.profile.skins[0].base64);
+    if (data?.profile?.skins[0]?.base64) await headplayer(data.profile.skins[0].base64);
 }
 
 async function headplayer(skinBase64) {
@@ -83,34 +97,40 @@ async function headplayer(skinBase64) {
 }
 
 async function setStatus(opt) {
-    let nameServerElement = document.querySelector('.server-status-name')
-    let statusServerElement = document.querySelector('.server-status-text')
-    let playersOnline = document.querySelector('.status-player-count .player-count')
+    let nameServerElement = document.querySelector('.server-status-name');
+    let statusServerElement = document.querySelector('.server-status-text');
+    let playersOnline = document.querySelector('.status-player-count .player-count');
+    console.log('Initializing server status... (refresh every 15sec)')
 
-    if (!opt) {
-        statusServerElement.classList.add('red')
-        statusServerElement.innerHTML = `Ferme - 0 ms`
-        document.querySelector('.status-player-count').classList.add('red')
-        playersOnline.innerHTML = '0'
-        return
+    async function updateStatus() {
+        if(!opt) {
+            statusServerElement.innerHTML = `Hors ligne - 0 ms`;
+            playersOnline.innerHTML = '0';
+            return;
+        }
+
+        let { ip, port, nameServer } = opt;
+        nameServerElement.innerHTML = nameServer;
+        let status = new Status(ip, port);
+        let statusServer = await status.getStatus().then(res => res).catch(err => err);
+
+        if(!statusServer.error) {
+            statusServerElement.classList.remove('red');
+            statusServerElement.classList.add('green');
+            document.querySelector('.status-player-count').classList.remove('red');
+            document.querySelector('.status-player-count').classList.add('green');
+            statusServerElement.innerHTML = `En ligne - ${statusServer.ms} ms`;
+            playersOnline.innerHTML = statusServer.playersConnect;
+        } else {
+            statusServerElement.innerHTML = `Hors ligne - 0 ms`;
+            playersOnline.innerHTML = '0';
+        }
     }
+    await updateStatus();
 
-    let { ip, port, nameServer } = opt
-    nameServerElement.innerHTML = nameServer
-    let status = new Status(ip, port);
-    let statusServer = await status.getStatus().then(res => res).catch(err => err);
-
-    if (!statusServer.error) {
-        statusServerElement.classList.remove('red')
-        document.querySelector('.status-player-count').classList.remove('red')
-        statusServerElement.innerHTML = `En ligne - ${statusServer.ms} ms`
-        playersOnline.innerHTML = statusServer.playersConnect
-    } else {
-        statusServerElement.classList.add('red')
-        statusServerElement.innerHTML = `Ferme - 0 ms`
-        document.querySelector('.status-player-count').classList.add('red')
-        playersOnline.innerHTML = '0'
-    }
+    setInterval(() => {
+        updateStatus();
+    }, 15000);
 }
 
 
