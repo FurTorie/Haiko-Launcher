@@ -1,5 +1,5 @@
 /**
- * @author Luuxis
+ * @author Luuxis edite upgrade FurTorie (DorianCarriere)
  * Luuxis License v1.0 (voir fichier LICENSE pour les détails en FR/EN)
  */
 import { config, database, logger, changePanel, appdata, setStatus, pkg, popup } from '../utils.js'
@@ -12,6 +12,7 @@ class Home {
     constructor() {
         this.currentInstance = null; // Instance courante pour la session
         this.instancesList = null; // Liste des instances
+        this.isLaunching = false; // Flag pour empêcher le double-clic
     }
     async init(config) {
         this.config = config;
@@ -119,13 +120,18 @@ class Home {
     async instancesSelect() {
         let configClient = await this.db.readData('configClient')
         let auth = await this.db.readData('accounts', configClient.account_selected)
-        this.instancesList = await config.getInstanceList()
-        let instanceSelect = this.instancesList.find(i => i.name == configClient?.instance_selct) ? configClient?.instance_selct : null
-
+        
+        // Afficher un statut de chargement
         let instanceBTN = document.querySelector('.play-instance')
         let instancePopup = document.querySelector('.instance-popup')
         let instancesListPopup = document.querySelector('.instances-List')
         let instanceCloseBTN = document.querySelector('.close-popup')
+        
+        // Mettre le bouton en mode chargement
+        this.setPlayButtonLoading(true, 'Chargement des instances...')
+        
+        this.instancesList = await config.getInstanceList()
+        let instanceSelect = this.instancesList.find(i => i.name == configClient?.instance_selct) ? configClient?.instance_selct : null
 
         if (this.instancesList.length === 1) {
             document.querySelector('.instance-select').style.display = 'none'
@@ -174,6 +180,9 @@ class Home {
         // Mettre à jour l'état du bouton jouer selon l'instance sélectionnée (instantané)
         this.updatePlayButtonStateInstant(instanceSelect, this.instancesList)
         this.updateInstanceDisplayInstant(instanceSelect)
+        
+        // Retirer le statut de chargement
+        this.setPlayButtonLoading(false)
 
         instancePopup.addEventListener('click', async e => {
             let configClient = await this.db.readData('configClient')
@@ -256,6 +265,15 @@ class Home {
     }
 
     async startGame() {
+        // Empêcher le double-clic
+        if (this.isLaunching) {
+            console.log('Lancement déjà en cours - ignoré')
+            return
+        }
+        
+        this.isLaunching = true
+        this.setPlayButtonLoading(true, 'Préparation du lancement...')
+        
         let launch = new Launch()
         let configClient = await this.db.readData('configClient')
         let instance = await config.getInstanceList()
@@ -266,6 +284,8 @@ class Home {
         // Vérifier que l'instance existe et n'est pas l'instance d'accueil
         if (!options || options.isWelcome) {
             console.log('Instance invalide ou instance d\'accueil - lancement annulé')
+            this.isLaunching = false
+            this.setPlayButtonLoading(false)
             return
         }
 
@@ -370,6 +390,8 @@ class Home {
             infoStartingBOX.style.display = "none"
             playInstanceBTN.style.display = "flex"
             infoStarting.innerHTML = `Vérification`
+            this.isLaunching = false  // Réinitialiser le flag de lancement
+            this.setPlayButtonLoading(false)
             new logger(pkg.name, '#7289da');
             console.log('Close');
         });
@@ -391,6 +413,8 @@ class Home {
             infoStartingBOX.style.display = "none"
             playInstanceBTN.style.display = "flex"
             infoStarting.innerHTML = `Vérification`
+            this.isLaunching = false  // Réinitialiser le flag de lancement
+            this.setPlayButtonLoading(false)
             new logger(pkg.name, '#7289da');
             console.log(err);
         });
@@ -536,6 +560,32 @@ class Home {
         
         // Recharger les news avec le filtre
         await this.news();
+    }
+
+    setPlayButtonLoading(isLoading, message = 'Chargement...') {
+        let playInstanceBTN = document.querySelector('.play-instance')
+        let instanceNameElement = document.querySelector('.instance-name')
+        
+        if (isLoading) {
+            // Mode chargement
+            playInstanceBTN.classList.add('loading')
+            playInstanceBTN.style.pointerEvents = 'none'
+            playInstanceBTN.style.opacity = '0.7'
+            
+            if (instanceNameElement) {
+                this.originalInstanceName = instanceNameElement.textContent
+                instanceNameElement.textContent = message
+            }
+        } else {
+            // Mode normal
+            playInstanceBTN.classList.remove('loading')
+            playInstanceBTN.style.pointerEvents = ''
+            playInstanceBTN.style.opacity = ''
+            
+            if (instanceNameElement && this.originalInstanceName) {
+                instanceNameElement.textContent = this.originalInstanceName
+            }
+        }
     }
 }
 export default Home;
