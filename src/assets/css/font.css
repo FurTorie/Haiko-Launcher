@@ -73,6 +73,7 @@
     .icon-web { background-image: url('../images/svgs/dark-web.svg'); background-size: contain; }
     .icon-tebex { background-image: url("../images/svgs/dark-tebex.svg"); background-size: contain; }
     .icon-dynmap { background-image: url("../images/svgs/dark-dynmap.svg"); background-size: contain; }
+    .icon-gitbook { background-image: url("../images/svgs/dark-gitbook.svg"); background-size: contain; }
 
     .icon-return { background-image: url("../images/svgs/dark-return.svg"); background-size: contain; }
     .icon-account { background-image: url("../images/svgs/dark-account.svg"); background-size: contain; }
@@ -95,6 +96,7 @@
     .icon-web { background-image: url('../images/svgs/light-web.svg'); background-size: contain; }
     .icon-tebex { background-image: url("../images/svgs/light-tebex.svg"); background-size: contain; }
     .icon-dynmap { background-image: url("../images/svgs/light-dynmap.svg"); background-size: contain; }
+    .icon-gitbook { background-image: url("../images/svgs/light-gitbook.svg"); background-size: contain; }
 
     .icon-return { background-image: url("../images/svgs/light-return.svg"); background-size: contain; }
     .icon-account { background-image: url("../images/svgs/light-account.svg"); background-size: contain; }
