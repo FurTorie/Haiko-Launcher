@@ -111,3 +111,20 @@
     opacity: 0.8;
     line-height: 1.4;
 }
+
+/* Styles pour les boutons de connexion en état de chargement */
+.connect-offline:disabled,
+.connect-AZauth:disabled,
+.connect-AZauth-A2F:disabled {
+    opacity: 0.7 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    transition: all 0.3s ease;
+}
+
+.connect-offline:disabled:hover,
+.connect-AZauth:disabled:hover,
+.connect-AZauth-A2F:disabled:hover {
+    opacity: 0.7 !important;
+    transform: none !important;
+}

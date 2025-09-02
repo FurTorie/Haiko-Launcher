@@ -217,10 +217,12 @@ class Login {
                 console.log('Connection already in progress, ignoring click');
                 return;
             }
-            connectOffline.disabled = true;
+            
+            // Activer l'état de chargement
+            this.setConnectionButtonLoading(connectOffline, true, 'Connexion...');
             
             if (emailOffline.value.length < 3) {
-                connectOffline.disabled = false;
+                this.setConnectionButtonLoading(connectOffline, false);
                 popupLogin.openPopup({
                     title: 'Erreur',
                     content: 'Votre pseudo doit faire au moins 3 caractères.',
@@ -230,7 +232,7 @@ class Login {
             }
 
             if (emailOffline.value.match(/ /g)) {
-                connectOffline.disabled = false;
+                this.setConnectionButtonLoading(connectOffline, false);
                 popupLogin.openPopup({
                     title: 'Erreur',
                     content: 'Votre pseudo ne doit pas contenir d\'espaces.',
@@ -242,7 +244,7 @@ class Login {
             let MojangConnect = await Mojang.login(emailOffline.value);
 
             if (MojangConnect.error) {
-                connectOffline.disabled = false;
+                this.setConnectionButtonLoading(connectOffline, false);
                 popupLogin.openPopup({
                     title: 'Erreur',
                     content: MojangConnect.message,
@@ -258,9 +260,32 @@ class Login {
             MojangConnect.original_auth_method = 'crack';
             
             await this.saveData(MojangConnect);
-            connectOffline.disabled = false;
+            this.setConnectionButtonLoading(connectOffline, false);
             popupLogin.closePopup();
         });
+    }
+
+    // Fonction pour gérer l'état de chargement des boutons de connexion
+    setConnectionButtonLoading(button, isLoading, message = 'Connexion...') {
+        if (!button) return;
+        
+        if (isLoading) {
+            // Mode chargement
+            button.disabled = true;
+            button.style.opacity = '0.7';
+            button.style.cursor = 'not-allowed';
+            button.originalTextContent = button.textContent;
+            button.textContent = message;
+        } else {
+            // Mode normal
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
+            if (button.originalTextContent) {
+                button.textContent = button.originalTextContent;
+                delete button.originalTextContent;
+            }
+        }
     }
 
     async getAZauth() {
@@ -290,6 +315,15 @@ class Login {
         }
 
         AZauthConnectBTN.addEventListener('click', async () => {
+            // Protection contre les clics multiples
+            if (AZauthConnectBTN.disabled) {
+                console.log('AZauth connection already in progress, ignoring click');
+                return;
+            }
+            
+            // Activer l'état de chargement
+            this.setConnectionButtonLoading(AZauthConnectBTN, true, 'Connexion...');
+            
             PopupLogin.openPopup({
                 title: 'Connexion en cours...',
                 content: 'Veuillez patienter...',
@@ -297,6 +331,7 @@ class Login {
             });
 
             if (AZauthEmail.value == '' || AZauthPassword.value == '') {
+                this.setConnectionButtonLoading(AZauthConnectBTN, false);
                 PopupLogin.openPopup({
                     title: 'Erreur',
                     content: 'Veuillez remplir tous les champs.',
@@ -308,6 +343,7 @@ class Login {
             let AZauthConnect = await AZauthClient.login(AZauthEmail.value, AZauthPassword.value);
 
             if (AZauthConnect.error) {
+                this.setConnectionButtonLoading(AZauthConnectBTN, false);
                 PopupLogin.openPopup({
                     title: 'Erreur',
                     content: AZauthConnect.message,
@@ -315,6 +351,7 @@ class Login {
                 });
                 return;
             } else if (AZauthConnect.A2F) {
+                this.setConnectionButtonLoading(AZauthConnectBTN, false);
                 loginAZauthA2F.style.display = 'block';
                 loginAZauthA2F.style.visibility = 'visible';
                 loginAZauth.style.display = 'none';
@@ -327,6 +364,15 @@ class Login {
                 });
 
                 connectAZauthA2F.addEventListener('click', async () => {
+                    // Protection contre les clics multiples
+                    if (connectAZauthA2F.disabled) {
+                        console.log('AZauth A2F connection already in progress, ignoring click');
+                        return;
+                    }
+                    
+                    // Activer l'état de chargement
+                    this.setConnectionButtonLoading(connectAZauthA2F, true, 'Vérification...');
+                    
                     PopupLogin.openPopup({
                         title: 'Connexion en cours...',
                         content: 'Veuillez patienter...',
@@ -334,6 +380,7 @@ class Login {
                     });
 
                     if (AZauthA2F.value == '') {
+                        this.setConnectionButtonLoading(connectAZauthA2F, false);
                         PopupLogin.openPopup({
                             title: 'Erreur',
                             content: 'Veuillez entrer le code A2F.',
@@ -345,6 +392,7 @@ class Login {
                     AZauthConnect = await AZauthClient.login(AZauthEmail.value, AZauthPassword.value, AZauthA2F.value);
 
                     if (AZauthConnect.error) {
+                        this.setConnectionButtonLoading(connectAZauthA2F, false);
                         PopupLogin.openPopup({
                             title: 'Erreur',
                             content: AZauthConnect.message,
@@ -359,7 +407,8 @@ class Login {
                     AZauthConnect.auth_source = 'azauth';
                     AZauthConnect.original_auth_method = 'premium';
 
-                    await this.saveData(AZauthConnect)
+                    await this.saveData(AZauthConnect);
+                    this.setConnectionButtonLoading(connectAZauthA2F, false);
                     PopupLogin.closePopup();
                 });
             } else if (!AZauthConnect.A2F) {
@@ -369,7 +418,8 @@ class Login {
                 AZauthConnect.auth_source = 'azauth';
                 AZauthConnect.original_auth_method = 'premium';
                 
-                await this.saveData(AZauthConnect)
+                await this.saveData(AZauthConnect);
+                this.setConnectionButtonLoading(AZauthConnectBTN, false);
                 PopupLogin.closePopup();
             }
         });
@@ -601,13 +651,14 @@ class Login {
         
         console.log('PHASE 7: Decision logic - fromSettings:', fromSettings, 'hasAccounts:', hasAccounts);
         
-        // Afficher le bouton retour SEULEMENT si on vient des paramètres OU s'il y a des comptes
+        // Afficher le bouton retour SEULEMENT si on vient des paramètres ET qu'il y a au moins un compte
+        // Si on supprime le dernier compte, FORCER la création d'un nouveau (pas de retour possible)
         if (choiceCancelBtn) {
-            if (fromSettings || hasAccounts) {
-                console.log('SHOWING cancel button on method choice (reason: fromSettings=' + fromSettings + ', hasAccounts=' + hasAccounts + ')');
+            if (fromSettings && hasAccounts) {
+                console.log('SHOWING cancel button on method choice (fromSettings=true AND hasAccounts=true)');
                 choiceCancelBtn.style.display = 'inline';
             } else {
-                console.log('HIDING cancel button on method choice (first launch, no accounts)');
+                console.log('HIDING cancel button on method choice (reason: fromSettings=' + fromSettings + ', hasAccounts=' + hasAccounts + ' - need at least one account)');
                 choiceCancelBtn.style.display = 'none';
             }
         } else {
