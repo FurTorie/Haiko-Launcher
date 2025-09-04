@@ -4,7 +4,7 @@
  */
 
 const path = require('path');
-const pkg = require(path.join(process.cwd(), 'package.json'));
+const pkg = require('../package.json');
 const nodeFetch = require("node-fetch");
 const convert = require('xml-js');
 let url = pkg.user ? `${pkg.url}/${pkg.user}` : pkg.url

@@ -131,16 +131,7 @@ class Home {
         this.setPlayButtonLoading(true, 'Chargement des instances...')
         
         // 1. LIRE LA CONFIGURATION DEPUIS PACKAGE.JSON
-        // Lire directement depuis le fichier pour éviter les problèmes de cache
-        const fs = require('fs');
-        const path = require('path');
-        let launcherConfig = {};
-        try {
-            const pkgData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
-            launcherConfig = pkgData.launcherConfig || {};
-        } catch (e) {
-            console.error('Erreur lecture package.json:', e);
-        }
+        const launcherConfig = pkg.launcherConfig || {};
         const enableWelcomeInstance = launcherConfig.enableWelcomeInstance ?? true; // Par défaut true pour compatibilité
         const defaultInstance = launcherConfig.defaultInstance || null;
         

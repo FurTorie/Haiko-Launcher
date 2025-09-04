@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npm start)",
-      "Read(/C:\\Users\\DorianCarriere\\Desktop\\Haiko-Launcher\\src\\panels/**)"
+      "Read(/C:\\Users\\DorianCarriere\\Desktop\\Haiko-Launcher\\src\\panels/**)",
+      "Read(/C:\\Users\\DorianCarriere\\Desktop\\Haiko-Launcher - Copie\\src\\assets\\js\\utils/**)",
+      "Read(/C:\\Users\\DorianCarriere\\Desktop\\Haiko-Launcher\\src\\assets\\js\\utils/**)"
     ],
     "deny": []
   }
