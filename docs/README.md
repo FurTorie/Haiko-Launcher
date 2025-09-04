@@ -13,7 +13,21 @@
   <img src="https://img.shields.io/github/license/FurTorie/Haiko-Launcher.svg" alt="License">
 </p>
 
-## ✨ Fonctionnalités
+## ✨ Nouveautés v1.10.7
+
+### 🎨 Système de Background URL Configurable
+- **Configuration centralisée** - URL de background par défaut maintenant dans `package.json`
+- **Mode défaut intelligent** - Les administrateurs peuvent changer l'URL et elle se met à jour automatiquement
+- **Interface repensée** - Mode défaut avec champ vide, transition automatique vers mode personnalisé
+- **Persistance améliorée** - Le mode défaut reste vraiment "défaut" même après redémarrage
+
+### 🔧 Système d'Instance Configurable (v1.10.4-1.10.6)
+- **Instance d'accueil toggleable** - Activable/désactivable via configuration
+- **Instance par défaut personnalisable** - Fallback configurable quand l'accueil est désactivé
+- **Gestion intelligente des whitelists** - Sécurité maintenue dans tous les scénarios
+- **Synchronisation parfaite** - Bouton, statut serveur et news toujours cohérents
+
+## 🚀 Fonctionnalités
 
 ### 🔐 Authentification
 - **Authentification Microsoft** - Connexion sécurisée avec votre compte Microsoft/Mojang
@@ -35,6 +49,9 @@
 
 ### 🎨 Interface
 - **Thèmes dynamiques** - Mode clair et sombre avec fonds personnalisés
+- **Background personnalisable** - Support des images (JPG, PNG, GIF, WEBP) et vidéos (MP4)
+  - **Mode Défaut** - Utilise l'URL du `package.json`, se met à jour automatiquement
+  - **Mode Personnalisé** - URL saisie par l'utilisateur, sauvegardée localement
 - **Rendu des skins** - Visualisation 3D de votre skin Minecraft
 - **Panneau de news** - Restez informé des dernières actualités du serveur
 - **Configuration avancée** - Paramètres détaillés pour optimiser votre expérience
@@ -85,6 +102,25 @@ npm run icon
 - **Authentification** : minecraft-java-core pour Microsoft Auth
 - **Build** : Système de build personnalisé avec obfuscation JavaScript
 
+### ⚙️ Configuration (`package.json`)
+
+```json
+{
+  "launcherConfig": {
+    "enableWelcomeInstance": true,
+    "defaultInstance": null,
+    "defaultBackgroundUrl": "https://example.com/background.mp4"
+  }
+}
+```
+
+**Options disponibles :**
+- `enableWelcomeInstance` (boolean) - Activer/désactiver l'instance d'accueil "Accueil"
+- `defaultInstance` (string|null) - Instance par défaut quand l'instance d'accueil est désactivée
+- `defaultBackgroundUrl` (string) - URL du fond d'écran par défaut
+
+> **Note** : Les modifications de `defaultBackgroundUrl` sont automatiquement visibles pour tous les utilisateurs en mode défaut au prochain démarrage.
+
 ## 📝 Crédits
 
 Ce projet est un fork de [Selvania-Launcher](https://github.com/luuxis/Selvania-Launcher) par luuxis.
@@ -100,11 +136,27 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 - Proposer de nouvelles fonctionnalités
 - Soumettre une pull request
 
+## 📋 Historique des versions
+
+### v1.10.7 (Actuelle)
+- 🎨 Système de Background URL configurable et centralisé
+- 🔧 Mode défaut intelligent avec mise à jour automatique
+- 🛠️ Interface repensée pour les backgrounds personnalisés
+
+### v1.10.4 - v1.10.6
+- 🎯 Système d'instances configurable
+- ⚙️ Instance d'accueil toggleable
+- 🔄 Gestion intelligente des whitelists et fallbacks
+
+### Versions antérieures
+Consultez les [Releases](https://github.com/FurTorie/Haiko-Launcher/releases) pour l'historique complet.
+
 ## 📞 Support
 
 Besoin d'aide ? Rejoignez notre communauté :
+- [Issues GitHub](https://github.com/FurTorie/Haiko-Launcher/issues)
+- [Releases](https://github.com/FurTorie/Haiko-Launcher/releases) pour les notes de version détaillées
 - Discord Haiko
-- Issues GitHub
 
 ---
 
