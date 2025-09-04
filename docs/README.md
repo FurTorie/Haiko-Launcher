@@ -162,7 +162,7 @@ Consultez les [Releases](https://github.com/FurTorie/Haiko-Launcher/releases) po
 Besoin d'aide ? Rejoignez notre communauté :
 - [Issues GitHub](https://github.com/FurTorie/Haiko-Launcher/issues)
 - [Releases](https://github.com/FurTorie/Haiko-Launcher/releases) pour les notes de version détaillées
-- Discord Haiko
+- [Discord](https://discord.gg/WmCjbPw8sr) Haiko
 
 ---
 
