@@ -122,6 +122,9 @@ npm run icon
 
 > **Note** : Les modifications de `defaultBackgroundUrl` sont automatiquement visibles pour tous les utilisateurs en mode défaut au prochain démarrage.
 
+### 📰 Configuration des News (côté serveur)
+Pour configurer le système de news filtrées par instance côté serveur web, consultez le [**Tutoriel News**](https://github.com/FurTorie/Haiko-Launcher/blob/master/docs/TUTO-NEWS.md).
+
 ## 📝 Crédits
 
 Ce projet est un fork de [Selvania-Launcher](https://github.com/luuxis/Selvania-Launcher) par luuxis.
