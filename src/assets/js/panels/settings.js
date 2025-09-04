@@ -3,7 +3,7 @@
  * Luuxis License v1.0 (voir fichier LICENSE pour les détails en FR/EN)
  */
 
-import { changePanel, accountSelect, database, Slider, config, setStatus, popup, appdata, setBackground, addAccount } from '../utils.js'
+import { changePanel, accountSelect, database, Slider, config, setStatus, popup, appdata, setBackground, addAccount, pkg } from '../utils.js'
 const { ipcRenderer } = require('electron');
 const os = require('os');
 
@@ -408,16 +408,43 @@ class Settings {
 
     async backgroundUrl() {
         let configClient = await this.db.readData('configClient');
-        let backgroundUrl = configClient?.launcher_config?.background_url || 'https://i.imgur.com/6W316YN.mp4';
+        
+        // Initialiser en mode défaut si pas de configuration
+        if (!configClient?.launcher_config?.background_url) {
+            if (!configClient.launcher_config) configClient.launcher_config = {};
+            configClient.launcher_config.background_url = 'DEFAULT';
+            await this.db.updateData('configClient', configClient);
+        }
+        
+        // Seul 'DEFAULT' = mode défaut, tout le reste = mode personnalisé
+        let isDefaultMode = configClient.launcher_config.background_url === 'DEFAULT';
+        let backgroundUrl = isDefaultMode ? pkg.launcherConfig?.defaultBackgroundUrl : configClient.launcher_config.background_url;
         
         let backgroundUrlInput = document.querySelector(".background-url-input");
-        let backgroundUrlReset = document.querySelector(".background-url-reset");
+        let backgroundUrlDefault = document.querySelector(".background-url-default");
         let backgroundUrlPreview = document.querySelector(".background-url-preview");
         
-        backgroundUrlInput.value = backgroundUrl;
+        // Configuration de l'interface selon le mode
+        if (isDefaultMode) {
+            backgroundUrlInput.value = ''; // Champ vide en mode défaut
+            backgroundUrlInput.placeholder = 'Mode Défaut - Saisissez URL pour personnaliser';
+            backgroundUrlInput.readOnly = false; // ÉDITABLE en mode défaut
+            backgroundUrlDefault.textContent = 'Personnaliser';
+            backgroundUrlDefault.style.cursor = 'not-allowed'; // PAS cliquable
+            backgroundUrlDefault.style.opacity = '0.6'; // Visuel désactivé
+            backgroundUrlDefault.disabled = true;
+        } else {
+            backgroundUrlInput.value = backgroundUrl || ''; // URL personnalisée en mode personnalisé
+            backgroundUrlInput.placeholder = 'URL personnalisée';
+            backgroundUrlInput.readOnly = false;
+            backgroundUrlDefault.textContent = 'Défaut';
+            backgroundUrlDefault.style.cursor = 'pointer';
+            backgroundUrlDefault.style.opacity = '1';
+            backgroundUrlDefault.disabled = false;
+        }
 
         // Fonction pour valider et appliquer l'URL
-        const applyBackgroundUrl = async (url) => {
+        const applyBackgroundUrl = async (url, saveToDatabase = true) => {
             if (url && url.trim()) {
                 // Valider que l'URL est une image ou vidéo
                 const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4'];
@@ -473,11 +500,13 @@ class Settings {
                                     // Ajouter la vidéo au body
                                     document.body.appendChild(videoElement);
                                     
-                                    // Sauvegarder en base
-                                    let configClient = await this.db.readData('configClient');
-                                    if (!configClient.launcher_config) configClient.launcher_config = {};
-                                    configClient.launcher_config.background_url = url;
-                                    await this.db.updateData('configClient', configClient);
+                                    // Sauvegarder en base seulement si demandé
+                                    if (saveToDatabase) {
+                                        let configClient = await this.db.readData('configClient');
+                                        if (!configClient.launcher_config) configClient.launcher_config = {};
+                                        configClient.launcher_config.background_url = url;
+                                        await this.db.updateData('configClient', configClient);
+                                    }
                                     
                                     resolve(true);
                                 };
@@ -508,11 +537,13 @@ class Settings {
                                     document.body.style.backgroundRepeat = 'no-repeat';
                                     document.body.style.backgroundAttachment = 'fixed';
                                     
-                                    // Sauvegarder en base
-                                    let configClient = await this.db.readData('configClient');
-                                    if (!configClient.launcher_config) configClient.launcher_config = {};
-                                    configClient.launcher_config.background_url = url;
-                                    await this.db.updateData('configClient', configClient);
+                                    // Sauvegarder en base seulement si demandé
+                                    if (saveToDatabase) {
+                                        let configClient = await this.db.readData('configClient');
+                                        if (!configClient.launcher_config) configClient.launcher_config = {};
+                                        configClient.launcher_config.background_url = url;
+                                        await this.db.updateData('configClient', configClient);
+                                    }
                                     
                                     resolve(true);
                                 };
@@ -548,24 +579,50 @@ class Settings {
             }
         };
 
-        // Appliquer l'URL sauvegardée au chargement
-        if (backgroundUrl) {
-            try {
-                await applyBackgroundUrl(backgroundUrl);
-            } catch (error) {
-                console.log('Erreur lors du chargement du fond personnalisé:', error.message);
+        // Appliquer l'URL au chargement selon le mode
+        if (isDefaultMode) {
+            // Mode défaut : appliquer l'URL du package.json (mais le champ reste vide)
+            const defaultBgUrl = pkg.launcherConfig?.defaultBackgroundUrl;
+            if (defaultBgUrl) {
+                try {
+                    await applyBackgroundUrl(defaultBgUrl, false); // NE PAS sauvegarder
+                } catch (error) {
+                    console.log('Erreur lors du chargement du fond par défaut:', error.message);
+                }
+            }
+        } else {
+            // Mode personnalisé : appliquer l'URL stockée
+            if (backgroundUrl) {
+                try {
+                    await applyBackgroundUrl(backgroundUrl);
+                } catch (error) {
+                    console.log('Erreur lors du chargement du fond personnalisé:', error.message);
+                }
             }
         }
 
-        // Événement sur changement d'URL
+        // Événement sur changement d'URL - passe automatiquement en mode personnalisé
         backgroundUrlInput.addEventListener("blur", async () => {
             const url = backgroundUrlInput.value.trim();
-            try {
-                await applyBackgroundUrl(url);
-            } catch (error) {
-                alert(error.message);
-                // Revenir à la valeur précédente
-                backgroundUrlInput.value = backgroundUrl;
+            if (url) {
+                try {
+                    await applyBackgroundUrl(url);
+                    // Passer automatiquement en mode personnalisé
+                    let configClient = await this.db.readData('configClient');
+                    if (!configClient.launcher_config) configClient.launcher_config = {};
+                    configClient.launcher_config.background_url = url;
+                    await this.db.updateData('configClient', configClient);
+                    
+                    // Mettre à jour le bouton pour le rendre cliquable
+                    backgroundUrlDefault.textContent = 'Défaut';
+                    backgroundUrlDefault.style.cursor = 'pointer';
+                    backgroundUrlDefault.style.opacity = '1';
+                    backgroundUrlDefault.disabled = false;
+                } catch (error) {
+                    alert(error.message);
+                    // Revenir à l'état précédent
+                    backgroundUrlInput.value = backgroundUrl;
+                }
             }
         });
 
@@ -573,12 +630,25 @@ class Settings {
         backgroundUrlInput.addEventListener("keypress", async (e) => {
             if (e.key === 'Enter') {
                 const url = backgroundUrlInput.value.trim();
-                try {
-                    await applyBackgroundUrl(url);
-                    backgroundUrl = url; // Mettre à jour la valeur de référence
-                } catch (error) {
-                    alert(error.message);
-                    backgroundUrlInput.value = backgroundUrl;
+                if (url) {
+                    try {
+                        await applyBackgroundUrl(url);
+                        // Passer automatiquement en mode personnalisé
+                        let configClient = await this.db.readData('configClient');
+                        if (!configClient.launcher_config) configClient.launcher_config = {};
+                        configClient.launcher_config.background_url = url;
+                        await this.db.updateData('configClient', configClient);
+                        
+                        // Mettre à jour le bouton pour le rendre cliquable
+                        backgroundUrlDefault.textContent = 'Défaut';
+                        backgroundUrlDefault.style.cursor = 'pointer';
+                        backgroundUrlDefault.style.opacity = '1';
+                        backgroundUrlDefault.disabled = false;
+                        backgroundUrl = url;
+                    } catch (error) {
+                        alert(error.message);
+                        backgroundUrlInput.value = backgroundUrl;
+                    }
                 }
             }
         });
@@ -593,17 +663,48 @@ class Settings {
             
             try {
                 await applyBackgroundUrl(url);
-                backgroundUrl = url; // Mettre à jour la valeur de référence
+                // Passer automatiquement en mode personnalisé
+                let configClient = await this.db.readData('configClient');
+                if (!configClient.launcher_config) configClient.launcher_config = {};
+                configClient.launcher_config.background_url = url;
+                await this.db.updateData('configClient', configClient);
+                
+                // Mettre à jour le bouton pour le rendre cliquable
+                backgroundUrlDefault.textContent = 'Défaut';
+                backgroundUrlDefault.style.cursor = 'pointer';
+                backgroundUrlDefault.style.opacity = '1';
+                backgroundUrlDefault.disabled = false;
+                backgroundUrl = url;
             } catch (error) {
                 alert(error.message);
             }
         });
 
-        // Bouton réinitialiser
-        backgroundUrlReset.addEventListener("click", async () => {
-            backgroundUrlInput.value = 'https://i.imgur.com/6W316YN.mp4';
-            await applyBackgroundUrl('https://i.imgur.com/6W316YN.mp4');
-            backgroundUrl = 'https://i.imgur.com/6W316YN.mp4';
+        // Bouton défaut/personnaliser - seulement en mode personnalisé
+        backgroundUrlDefault.addEventListener("click", async () => {
+            if (!backgroundUrlDefault.disabled) {
+                let configClient = await this.db.readData('configClient');
+                if (!configClient.launcher_config) configClient.launcher_config = {};
+                
+                // Passer en mode défaut (seulement depuis mode personnalisé)
+                configClient.launcher_config.background_url = 'DEFAULT';
+                await this.db.updateData('configClient', configClient);
+                
+                // Recharger l'interface avec le nouveau mode
+                backgroundUrlInput.value = ''; // Champ TOUJOURS vide en mode défaut
+                backgroundUrlInput.placeholder = 'Mode Défaut - Saisissez URL pour personnaliser';
+                backgroundUrlInput.readOnly = false; // ÉDITABLE
+                backgroundUrlDefault.textContent = 'Personnaliser';
+                backgroundUrlDefault.style.cursor = 'not-allowed';
+                backgroundUrlDefault.style.opacity = '0.6';
+                backgroundUrlDefault.disabled = true;
+                
+                // Appliquer l'URL par défaut en arrière-plan (sans toucher au champ)
+                const defaultBgUrl = pkg.launcherConfig?.defaultBackgroundUrl;
+                if (defaultBgUrl) {
+                    await applyBackgroundUrl(defaultBgUrl, false); // NE PAS sauvegarder
+                }
+            }
         });
     }
 

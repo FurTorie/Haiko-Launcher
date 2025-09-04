@@ -25,6 +25,12 @@ async function setBackground(theme) {
         
         // Vérifier s'il y a un fond d'écran personnalisé
         let customBackgroundUrl = configClient?.launcher_config?.background_url;
+        
+        // Si mode défaut, utiliser l'URL du package.json
+        if (customBackgroundUrl === 'DEFAULT') {
+            customBackgroundUrl = pkg.launcherConfig?.defaultBackgroundUrl;
+        }
+        
         if (customBackgroundUrl && customBackgroundUrl.trim()) {
             let body = document.body;
             body.className = theme ? 'dark global' : 'light global';

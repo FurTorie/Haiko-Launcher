@@ -1,7 +1,7 @@
 {
     "name": "Haiko-Launcher",
     "preductname": "Haiko Launcher",
-    "version": "1.10.6",
+    "version": "1.10.7",
     "description": "Launcher Mincraft pour le serveur Haiko",
     "main": "src/app.js",
     "author": {
@@ -43,6 +43,7 @@
     },
     "launcherConfig": {
         "enableWelcomeInstance": true,
-        "defaultInstance": null
+        "defaultInstance": null,
+        "defaultBackgroundUrl": "https://i.imgur.com/6W316YN.mp4"
     }
 }
