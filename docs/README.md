@@ -25,6 +25,7 @@
 - **Instance d'accueil toggleable** - Activable/désactivable via configuration
 - **Instance par défaut personnalisable** - Fallback configurable quand l'accueil est désactivé
 - **Gestion intelligente des whitelists** - Sécurité maintenue dans tous les scénarios
+- **News filtrées par instance** - Affichage automatique des actualités selon l'instance sélectionnée
 - **Synchronisation parfaite** - Bouton, statut serveur et news toujours cohérents
 
 ## 🚀 Fonctionnalités
@@ -53,7 +54,7 @@
   - **Mode Défaut** - Utilise l'URL du `package.json`, se met à jour automatiquement
   - **Mode Personnalisé** - URL saisie par l'utilisateur, sauvegardée localement
 - **Rendu des skins** - Visualisation 3D de votre skin Minecraft
-- **Panneau de news** - Restez informé des dernières actualités du serveur
+- **Panneau de news intelligent** - Affichage automatique des actualités filtrées selon l'instance sélectionnée
 - **Configuration avancée** - Paramètres détaillés pour optimiser votre expérience
 
 ## 📥 Installation
@@ -144,9 +145,11 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 - 🛠️ Interface repensée pour les backgrounds personnalisés
 
 ### v1.10.4 - v1.10.6
-- 🎯 Système d'instances configurable
-- ⚙️ Instance d'accueil toggleable
+- 🎯 Système d'instances configurable et intelligent
+- ⚙️ Instance d'accueil toggleable via configuration
+- 📰 News filtrées automatiquement par instance sélectionnée
 - 🔄 Gestion intelligente des whitelists et fallbacks
+- 🔄 Synchronisation complète bouton/statut/news
 
 ### Versions antérieures
 Consultez les [Releases](https://github.com/FurTorie/Haiko-Launcher/releases) pour l'historique complet.
