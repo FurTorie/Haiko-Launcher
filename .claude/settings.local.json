@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm start)"
+      "Bash(npm start)",
+      "Read(/C:\\Users\\DorianCarriere\\Desktop\\Haiko-Launcher\\src\\panels/**)"
     ],
     "deny": []
   }

@@ -17,9 +17,9 @@ class Home {
     async init(config) {
         this.config = config;
         this.db = new database();
-        this.news()
         this.socialLick()
-        this.instancesSelect()
+        await this.instancesSelect()  // Attendre que les instances soient configurées
+        this.news()  // Puis charger les news avec la bonne instance
         document.querySelector('.settings-btn').addEventListener('click', e => changePanel('settings'))
     }
 
@@ -130,34 +130,116 @@ class Home {
         // Mettre le bouton en mode chargement
         this.setPlayButtonLoading(true, 'Chargement des instances...')
         
+        // 1. LIRE LA CONFIGURATION DEPUIS PACKAGE.JSON
+        // Lire directement depuis le fichier pour éviter les problèmes de cache
+        const fs = require('fs');
+        const path = require('path');
+        let launcherConfig = {};
+        try {
+            const pkgData = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
+            launcherConfig = pkgData.launcherConfig || {};
+        } catch (e) {
+            console.error('Erreur lecture package.json:', e);
+        }
+        const enableWelcomeInstance = launcherConfig.enableWelcomeInstance ?? true; // Par défaut true pour compatibilité
+        const defaultInstance = launcherConfig.defaultInstance || null;
+        
+        
+        // 2. NETTOYER LA DB SI NÉCESSAIRE
+        if (!enableWelcomeInstance && configClient?.instance_selct === "Accueil") {
+            configClient.instance_selct = null;
+            await this.db.updateData('configClient', configClient);
+        }
+        
+        // 3. CHARGER LES INSTANCES (après le nettoyage)
         this.instancesList = await config.getInstanceList()
+        
+        
+        // 4. FONCTIONS HELPER
+        const canAccessInstance = async (instance, authUser) => {
+            if (!instance || !instance.whitelistActive) return true;
+            if (!authUser) return false;
+            let isWhitelisted = instance.whitelist.find(name => name === authUser.name);
+            return (isWhitelisted === authUser.name);
+        };
+
+        const tryLastInstanceOrFallback = async () => {
+            // Essayer d'abord la dernière instance sélectionnée par l'utilisateur
+            if (instanceSelect) {
+                let lastInstance = this.instancesList.find(i => i.name === instanceSelect);
+                let auth = await this.db.readData('accounts', configClient.account_selected);
+                if (lastInstance && await canAccessInstance(lastInstance, auth)) {
+                    this.currentInstance = lastInstance.name;
+                    return lastInstance.name;
+                }
+            }
+            
+            // Fallback : première instance disponible sans whitelist
+            let firstAvailable = this.instancesList.find(i => !i.whitelistActive && !i.isWelcome);
+            if (firstAvailable) {
+                this.currentInstance = firstAvailable.name;
+                let configClient = await this.db.readData('configClient');
+                configClient.instance_selct = firstAvailable.name;
+                await this.db.updateData('configClient', configClient);
+                return firstAvailable.name;
+            }
+            
+            return null;
+        };
+
+        // 5. MAINTENANT lire instanceSelect (après nettoyage et chargement)
         let instanceSelect = this.instancesList.find(i => i.name == configClient?.instance_selct) ? configClient?.instance_selct : null
 
         if (this.instancesList.length === 1) {
             document.querySelector('.instance-select').style.display = 'none'
             instanceBTN.style.paddingRight = '0'
         }
-
-        // Toujours forcer la sélection sur l'instance "Accueil" au démarrage
-        let welcomeInstance = this.instancesList.find(i => i.isWelcome == true)
-        if (welcomeInstance) {
-            this.currentInstance = welcomeInstance.name
-            instanceSelect = welcomeInstance.name
-            // Sauvegarder temporairement mais sera réinitialisé au prochain démarrage
-            let configClient = await this.db.readData('configClient')
-            configClient.instance_selct = welcomeInstance.name
-            await this.db.updateData('configClient', configClient)
-        } else if (!instanceSelect) {
-            // Fallback si pas d'instance d'accueil
-            let newInstanceSelect = this.instancesList.find(i => i.whitelistActive == false)
-            let configClient = await this.db.readData('configClient')
-            configClient.instance_selct = newInstanceSelect.name
-            instanceSelect = newInstanceSelect.name
-            this.currentInstance = newInstanceSelect.name
-            await this.db.updateData('configClient', configClient)
+        
+        if (enableWelcomeInstance) {
+            // Comportement original : forcer l'instance "Accueil" au démarrage
+            let welcomeInstance = this.instancesList.find(i => i.isWelcome == true)
+            if (welcomeInstance) {
+                this.currentInstance = welcomeInstance.name
+                instanceSelect = welcomeInstance.name
+                // Sauvegarder temporairement mais sera réinitialisé au prochain démarrage
+                let configClient = await this.db.readData('configClient')
+                configClient.instance_selct = welcomeInstance.name
+                await this.db.updateData('configClient', configClient)
+            }
         } else {
-            // Si une instance est déjà sélectionnée, mettre à jour la variable courante
-            this.currentInstance = instanceSelect
+            // Nouveau comportement : gestion configurable des instances
+            if (defaultInstance) {
+                // FORCER l'instance par défaut spécifiée (ignorer instance_selct existante)
+                let specifiedInstance = this.instancesList.find(i => i.name === defaultInstance)
+                let auth = await this.db.readData('accounts', configClient.account_selected);
+                
+                if (specifiedInstance && await canAccessInstance(specifiedInstance, auth)) {
+                    // Instance par défaut accessible, l'utiliser
+                    this.currentInstance = specifiedInstance.name
+                    instanceSelect = specifiedInstance.name
+                    let configClient = await this.db.readData('configClient')
+                    configClient.instance_selct = specifiedInstance.name
+                    await this.db.updateData('configClient', configClient)
+                } else {
+                    // Instance par défaut non accessible, utiliser la dernière instance de l'utilisateur
+                    instanceSelect = await tryLastInstanceOrFallback();
+                }
+            } else {
+                // defaultInstance est null : utiliser la dernière instance de l'utilisateur
+                instanceSelect = await tryLastInstanceOrFallback();
+            }
+        }
+        
+        // Fallback si aucune instance n'a pu être sélectionnée
+        if (!instanceSelect) {
+            let fallbackInstance = this.instancesList.find(i => i.whitelistActive == false)
+            if (fallbackInstance) {
+                let configClient = await this.db.readData('configClient')
+                configClient.instance_selct = fallbackInstance.name
+                instanceSelect = fallbackInstance.name
+                this.currentInstance = fallbackInstance.name
+                await this.db.updateData('configClient', configClient)
+            }
         }
 
         for (let instance of this.instancesList) {
@@ -179,7 +261,7 @@ class Home {
         
         // Mettre à jour l'état du bouton jouer selon l'instance sélectionnée (instantané)
         this.updatePlayButtonStateInstant(instanceSelect, this.instancesList)
-        this.updateInstanceDisplayInstant(instanceSelect)
+        this.updateInstanceDisplayInstant(this.currentInstance)
         
         // Retirer le statut de chargement
         this.setPlayButtonLoading(false)
@@ -458,7 +540,16 @@ class Home {
     updateInstanceDisplayInstant(instanceSelect) {
         let instanceNameElement = document.querySelector('.instance-name')
         if (instanceNameElement) {
-            instanceNameElement.textContent = instanceSelect || 'Accueil'
+            // Utiliser l'instance fournie ou la première disponible
+            let displayName = instanceSelect || this.currentInstance;
+            
+            // Si toujours pas de nom, chercher une instance disponible
+            if (!displayName && this.instancesList) {
+                let firstAvailable = this.instancesList.find(i => !i.whitelistActive && !i.isWelcome);
+                displayName = firstAvailable ? firstAvailable.name : 'Aucune instance';
+            }
+            
+            instanceNameElement.textContent = displayName || 'Chargement...';
             // Force un redraw immédiat
             instanceNameElement.offsetHeight;
         }
@@ -485,12 +576,10 @@ class Home {
     filterNewsByInstance(allNews) {
         if (!allNews || !Array.isArray(allNews)) return allNews;
         
-        let currentInstance = this.currentInstance || 'Accueil';
-        console.log('Filtering news for instance:', currentInstance);
+        let currentInstance = this.currentInstance || null;
         
         // Filtrer les news selon l'instance
         let filteredNews = allNews.filter(newsItem => {
-            console.log('News item instance:', newsItem.instance, 'Current:', currentInstance);
             // Si la news a un champ instance
             if (newsItem.instance) {
                 // Si c'est global, toujours afficher
@@ -502,7 +591,7 @@ class Home {
                 }
                 
                 // Si c'est une string, vérifier l'égalité (case-insensitive pour compatibilité)
-                return newsItem.instance.toLowerCase() === currentInstance.toLowerCase();
+                return newsItem.instance && currentInstance && newsItem.instance.toLowerCase() === currentInstance.toLowerCase();
             }
             
             // Si pas de champ instance, c'est pour l'Accueil uniquement
@@ -582,7 +671,9 @@ class Home {
             playInstanceBTN.style.pointerEvents = ''
             playInstanceBTN.style.opacity = ''
             
-            if (instanceNameElement && this.originalInstanceName) {
+            // Ne pas restaurer this.originalInstanceName si c'était "Chargement..."
+            // Dans ce cas, laisser updateInstanceDisplayInstant() s'occuper de l'affichage
+            if (instanceNameElement && this.originalInstanceName && this.originalInstanceName !== 'Chargement...') {
                 instanceNameElement.textContent = this.originalInstanceName
             }
         }

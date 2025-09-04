@@ -3,7 +3,8 @@
  * Luuxis License v1.0 (voir fichier LICENSE pour les détails en FR/EN)
  */
 
-const pkg = require('../package.json');
+const path = require('path');
+const pkg = require(path.join(process.cwd(), 'package.json'));
 const nodeFetch = require("node-fetch");
 const convert = require('xml-js');
 let url = pkg.user ? `${pkg.url}/${pkg.user}` : pkg.url
@@ -28,23 +29,29 @@ class Config {
         let instances = await nodeFetch(urlInstance).then(res => res.json()).catch(err => err)
         let instancesList = []
         
-        // Ajouter l'instance d'accueil par défaut en premier
-        instancesList.push({
-            name: "Accueil",
-            status: { ip: "serveur.haiko.fr", port: 25565, nameServer: "Accueil" },
-            whitelistActive: false,
-            whitelist: [],
-            url: null,
-            loadder: {
-                minecraft_version: "1.21",
-                loadder_type: "none",
-                loadder_version: null
-            },
-            verify: false,
-            ignored: [],
-            isWelcome: true, // Flag pour identifier l'instance d'accueil
-            logo: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9IiM0YzZlZjUiIHN0cm9rZT0iIzM3NTNkYyIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Im0yMCAyOCAxMi04IDEyIDh2MjBIMzZ2LTloLTh2OUgyMFYyOHoiIGZpbGw9IiNmZmZmZmYiLz4KPC9zdmc+" // Logo maison moderne en base64 SVG
-        })
+        // Lire la configuration depuis package.json pour conditionner l'instance d'accueil
+        const launcherConfig = pkg.launcherConfig || {};
+        const enableWelcomeInstance = launcherConfig.enableWelcomeInstance ?? true;
+        
+        // Ajouter l'instance d'accueil seulement si elle est activée dans la configuration
+        if (enableWelcomeInstance) {
+            instancesList.push({
+                name: "Accueil",
+                status: { ip: "serveur.haiko.fr", port: 25565, nameServer: "Accueil" },
+                whitelistActive: false,
+                whitelist: [],
+                url: null,
+                loadder: {
+                    minecraft_version: "1.21",
+                    loadder_type: "none",
+                    loadder_version: null
+                },
+                verify: false,
+                ignored: [],
+                isWelcome: true, // Flag pour identifier l'instance d'accueil
+                logo: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9IiM0YzZlZjUiIHN0cm9rZT0iIzM3NTNkYyIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Im0yMCAyOCAxMi04IDEyIDh2MjBIMzZ2LTloLTh2OUgyMFYyOHoiIGZpbGw9IiNmZmZmZmYiLz4KPC9zdmc+" // Logo maison moderne en base64 SVG
+            })
+        }
         
         instances = Object.entries(instances)
 
