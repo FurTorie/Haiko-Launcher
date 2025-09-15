@@ -3,8 +3,8 @@
 <h1 align="center">EarthKingdoms Launcher</h1>
 
 <p align="center">
-    <a href="https://discord.gg/PkbqPAAqEY">
-        <img src="https://invidget.switchblade.xyz/PkbqPAAqEY">
+    <a href="https://discord.gg/DqMmksNcWJ">
+        <img src="https://invidget.switchblade.xyz/DqMmksNcWJ">
     </a>
 </p>
 
