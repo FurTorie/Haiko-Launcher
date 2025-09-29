@@ -122,6 +122,8 @@ npm run icon
 
 > **Note** : Les modifications de `defaultBackgroundUrl` sont automatiquement visibles pour tous les utilisateurs en mode défaut au prochain démarrage.
 
+> ⚠️ **Avertissement VS Code** : Pour une raison inconnue, VS Code ajoute automatiquement une dépendance avec le nom du launcher dans le `package.json` lors de l'édition, ce qui peut faire planter le build. Il est fortement recommandé d'utiliser **WindSurf, Sublime Text, éditeur de texte windows** ou un autre éditeur de code pour modifier ce fichier.
+
 ### 📰 Configuration des News (côté serveur)
 Pour configurer le système de news filtrées par instance côté serveur web, consultez le [**Tutoriel News**](https://github.com/FurTorie/Haiko-Launcher/blob/master/docs/TUTO-NEWS.md).
 
