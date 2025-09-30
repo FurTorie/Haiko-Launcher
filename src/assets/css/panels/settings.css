@@ -164,7 +164,6 @@
 }
 
 .account {
-    /*background: var(--background-element);*/
     background: var(--background-light);
     border: solid 3px var(--dark);
     display: flex;

@@ -215,7 +215,7 @@ class Login {
         await addAccount(account);
         await accountSelect(account);
 
-        ipcRenderer.send('restart-app');
+        await changePanel('home');
     }
 }
 

@@ -240,7 +240,6 @@
     position: relative;
 }
 
-/* Texte du tooltip */
 .social-block::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -248,7 +247,7 @@
     color: var(--dark);
     padding: 6px 12px;
     border-radius: 6px;
-    border: 2px solid var(--dark); /* contour blanc */
+    border: 2px solid var(--dark);
     white-space: nowrap;
     font-size: 0.9rem;
     opacity: 0;
@@ -257,7 +256,6 @@
     z-index: 20;
 }
 
-/* Flèche du tooltip */
 .social-block::before {
     content: '';
     position: absolute;
@@ -270,35 +268,32 @@
     z-index: 21;
 }
 
-/* Tooltip à droite */
 .tooltip-right::after {
-    left: 125%; /* + d’espace */
+    left: 125%;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .tooltip-right::before {
-    left: calc(100% + 4px); /* décale la flèche */
+    left: calc(100% + 4px);
     top: 50%;
     transform: translateY(-50%);
     border-left-color: var(--dark);
 }
 
-/* Tooltip à gauche */
 .tooltip-left::after {
-    right: 125%; /* + d’espace */
+    right: 125%;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .tooltip-left::before {
-    right: calc(100% + 4px); /* décale la flèche */
+    right: calc(100% + 4px);
     top: 50%;
     transform: translateY(-50%);
     border-right-color: var(--dark);
 }
 
-/* Affichage au hover */
 .social-block:hover::after,
 .social-block:hover::before {
     opacity: 1;
