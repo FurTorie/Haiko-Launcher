@@ -214,12 +214,35 @@ async function accountSelect(data) {
 
     if (activeAccount) activeAccount.classList.toggle('account-select');
     account.classList.add('account-select');
-    if (data?.profile?.skins[0]?.base64) headplayer(data.profile.skins[0].base64);
+
+    // Mettre à jour l'avatar du joueur selon le type de compte actuel
+    let accountType = data.account_type || data.original_auth_method;
+
+    console.log(`Sélection du compte ${data.name} - Type détecté: ${accountType}`);
+
+    if (accountType === 'premium' && data?.profile?.skins[0]?.base64) {
+        // Compte premium avec skin disponible - utiliser le skin
+        console.log(`Compte premium ${data.name} avec skin détecté, application du skin`);
+        headplayer(data.profile.skins[0].base64);
+    } else if (accountType === 'premium') {
+        // Compte premium mais pas de skin disponible - remettre l'avatar par défaut
+        console.log(`Compte premium ${data.name} sans skin détecté, utilisation de l'avatar par défaut`);
+        resetPlayerHead();
+    } else {
+        // Compte crack ou autre - remettre l'avatar par défaut
+        console.log(`Compte non-premium ${data.name} détecté (${accountType}), utilisation de l'avatar par défaut`);
+        resetPlayerHead();
+    }
 }
 
 async function headplayer(skinBase64) {
     let skin = await new skin2D().creatHeadTexture(skinBase64);
     document.querySelector(".player-head").style.backgroundImage = `url(${skin})`;
+}
+
+async function resetPlayerHead() {
+    // Remettre l'avatar par défaut (setve.png)
+    document.querySelector(".player-head").style.backgroundImage = "url('./assets/images/default/setve.png')"
 }
 
 async function setStatus(opt) {
@@ -253,7 +276,6 @@ async function setStatus(opt) {
     }
 }
 
-
 export {
     appdata as appdata,
     changePanel as changePanel,
@@ -265,6 +287,8 @@ export {
     skin2D as skin2D,
     addAccount as addAccount,
     accountSelect as accountSelect,
+    headplayer as headplayer,
+    resetPlayerHead as resetPlayerHead,
     slider as Slider,
     pkg as pkg,
     setStatus as setStatus
