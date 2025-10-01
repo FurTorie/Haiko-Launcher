@@ -1,7 +1,7 @@
 {
     "name": "Haiko-Launcher",
     "preductname": "Haiko Launcher",
-    "version": "1.10.8",
+    "version": "1.10.9",
     "description": "Launcher Mincraft pour le serveur Haiko",
     "main": "src/app.js",
     "author": {
