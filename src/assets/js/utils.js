@@ -22,29 +22,29 @@ async function setBackground(theme) {
         let configClient = await databaseLauncher.readData('configClient');
         theme = configClient?.launcher_config?.theme || "auto"
         theme = await ipcRenderer.invoke('is-dark-theme', theme).then(res => res)
-        
+
         // Vérifier s'il y a un fond d'écran personnalisé
         let customBackgroundUrl = configClient?.launcher_config?.background_url;
-        
+
         // Si mode défaut, utiliser l'URL du package.json
         if (customBackgroundUrl === 'DEFAULT') {
             customBackgroundUrl = pkg.launcherConfig?.defaultBackgroundUrl;
         }
-        
+
         if (customBackgroundUrl && customBackgroundUrl.trim()) {
             let body = document.body;
             body.className = theme ? 'dark global' : 'light global';
-            
+
             // Déterminer si c'est une vidéo ou une image
             const isVideo = customBackgroundUrl.toLowerCase().includes('.mp4');
-            
+
             if (isVideo) {
                 // Supprimer toute vidéo de fond existante
                 const existingVideo = document.querySelector('.background-video');
                 if (existingVideo) {
                     existingVideo.remove();
                 }
-                
+
                 // Créer l'élément vidéo de fond
                 const videoElement = document.createElement('video');
                 videoElement.src = customBackgroundUrl;
@@ -53,7 +53,7 @@ async function setBackground(theme) {
                 videoElement.autoplay = true;
                 videoElement.playsInline = true;
                 videoElement.classList.add('background-video');
-                
+
                 // Styles pour la vidéo de fond
                 videoElement.style.cssText = `
                     position: fixed;
@@ -65,10 +65,10 @@ async function setBackground(theme) {
                     z-index: -1;
                     pointer-events: none;
                 `;
-                
+
                 // Supprimer le fond d'image s'il existe
                 body.style.backgroundImage = '';
-                
+
                 // Ajouter la vidéo au body
                 body.appendChild(videoElement);
             } else {
@@ -117,7 +117,7 @@ async function addAccount(data) {
         // Mettre à jour le compte existant au lieu de créer un doublon
         let skin = false
         if (data?.profile?.skins[0]?.base64) skin = await new skin2D().creatHeadTexture(data.profile.skins[0].base64);
-        
+
         // Même logique de détermination pour les comptes existants
         let accountType = data.account_type;
         if (!accountType) {
@@ -130,7 +130,7 @@ async function addAccount(data) {
             }
             console.log(`Updated account type for existing ${data.name}: ${accountType}`);
         }
-        
+
         // Afficher seulement l'indicateur de source (plus clair et moins encombrant)
         let authSourceIndicator = '';
         if (data.auth_source) {
@@ -142,7 +142,7 @@ async function addAccount(data) {
                 authSourceIndicator = ' (AZauth)';
             }
         }
-        
+
         existingAccount.innerHTML = `
             <div class="profile-image" ${skin ? 'style="background-image: url(' + skin + ');"' : ''}></div>
             <div class="profile-infos">
@@ -157,14 +157,14 @@ async function addAccount(data) {
         `;
         return existingAccount;
     }
-    
+
     console.log('Creating new account in DOM:', data.ID);
     let skin = false
     if (data?.profile?.skins[0]?.base64) skin = await new skin2D().creatHeadTexture(data.profile.skins[0].base64);
-    
+
     // Déterminer le type de compte pour l'indicateur visuel avec priorité sur les nouveaux tags
     let accountType = data.account_type;
-    
+
     // Si pas de account_type défini, utiliser l'ancien système mais avec les nouveaux tags
     if (!accountType) {
         if (data.original_auth_method === 'crack' || data.auth_source === 'offline' || data.type === 'offline') {
@@ -177,7 +177,7 @@ async function addAccount(data) {
         }
         console.log(`Determined account type for ${data.name}: ${accountType} (based on auth_source: ${data.auth_source}, original_auth_method: ${data.original_auth_method})`);
     }
-    
+
     // Afficher seulement l'indicateur de source (plus clair et moins encombrant)
     let authSourceIndicator = '';
     if (data.auth_source) {
@@ -189,7 +189,7 @@ async function addAccount(data) {
             authSourceIndicator = ' (AZauth)';
         }
     }
-    
+
     let div = document.createElement("div");
     div.classList.add("account");
     div.id = data.ID;
