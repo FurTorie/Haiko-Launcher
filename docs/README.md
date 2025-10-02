@@ -13,6 +13,9 @@
   <img src="https://img.shields.io/github/license/FurTorie/Haiko-Launcher.svg" alt="License">
 </p>
 
+[<p align="center"><img src="https://discordapp.com/api/guilds/820417155416719390/embed.png?style=banner2" alt="discord">](https://discord.gg/PAD8QrYnpP) 
+
+
 ## ✨ Nouveautés v1.10.7
 
 ### 🎨 Système de Background URL Configurable
