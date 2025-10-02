@@ -13,8 +13,11 @@
   <img src="https://img.shields.io/github/license/FurTorie/Haiko-Launcher.svg" alt="License">
 </p>
 
-[<p align="center"><img href="https://discord.gg/PAD8QrYnpP&mode=full" src="https://discordapp.com/api/guilds/820417155416719390/embed.png?style=banner2" alt="discord">](https://discord.gg/PAD8QrYnpP) 
+[<p align="center"><img href="https://discord.gg/PAD8QrYnpP&mode=full" src="https://discordapp.com/api/guilds/820417155416719390/embed.png?style=banner2" alt="discord">](https://discord.gg/PAD8QrYnpP)
 
+<p align="center"><a href="https://discord.gg/PAD8QrYnpP"><img src="https://discordapp.com/api/guilds/820417155416719390/embed.png?style=banner2&mode=full"></a></p>
+
+<p align="center"><a href="https://apps.microsoft.com/detail/Wino%20Mail/9NCRCVJC50WL?launch=true&mode=full"><img src="https://discordapp.com/api/guilds/820417155416719390/embed.png?style=banner2" width=90 height=90></a></p>
 
 ## ✨ Nouveautés v1.10.7
 
